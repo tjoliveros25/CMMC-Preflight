@@ -1,8 +1,9 @@
-// Page behaviour: reads a dropped file in the browser, runs the checks, draws the report.
+// Page behaviour: section routing, the checks table, and the report.
 // Nothing in this file (or anywhere in ReadyCheck) sends data over the network.
 import { parsePlan, parsePlanText, PlanError } from './parser.js';
 import { buildReport } from './report.js';
-import { STATUS_LABEL, DISCLAIMER } from './content.js';
+import { checks } from './checks/index.js';
+import { content, STATUS_LABEL, DISCLAIMER } from './content.js';
 import insecurePlan from '../samples/insecure-plan.js';
 import fixedPlan from '../samples/fixed-plan.js';
 
@@ -28,11 +29,51 @@ function h(tag, props = {}, ...children) {
 
 const two = (n) => String(n).padStart(2, '0');
 
+// ---------- Sections ----------
+
+const VIEWS = ['overview', 'check', 'checks', 'limits'];
+
+function showView(name) {
+  const view = VIEWS.includes(name) ? name : 'overview';
+  for (const id of VIEWS) $(`view-${id}`).hidden = id !== view;
+  for (const link of $('tabs').querySelectorAll('a')) {
+    const current = link.dataset.view === view;
+    link.classList.toggle('is-current', current);
+    if (current) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+const routeFromHash = () => showView(location.hash.replace(/^#/, ''));
+window.addEventListener('hashchange', routeFromHash);
+
+// ---------- The checks table ----------
+
+function renderChecksTable() {
+  $('checks-table').querySelector('tbody').replaceChildren(
+    ...checks.map((check, index) => {
+      const entry = content[check.id];
+      return h('tr', {},
+        h('td', { class: 'cell-num', text: two(index + 1) }),
+        h('th', { scope: 'row', text: entry.title }),
+        h('td', { text: entry.why }),
+        h('td', {}, entry.requirements.map((r) => h('span', { class: 'req', text: r }))),
+      );
+    }),
+  );
+}
+
 // ---------- Summary rail ----------
 
 function renderSummary(report, source) {
   const order = ['fail', 'unknown', 'pass', 'na'];
-  const bar = h('div', { class: 'bar', role: 'img', 'aria-label': order.map((s) => `${report.counts[s]} ${STATUS_LABEL[s].toLowerCase()}`).join(', ') });
+  const bar = h('div', {
+    class: 'bar',
+    role: 'img',
+    'aria-label': order.map((s) => `${report.counts[s]} ${STATUS_LABEL[s].toLowerCase()}`).join(', '),
+  });
   for (const status of order) {
     if (report.counts[status] === 0) continue;
     const segment = h('span', { class: 'bar-seg', 'data-status': status });
@@ -47,7 +88,10 @@ function renderSummary(report, source) {
       h('span', { class: 'score-num', text: String(report.passed) }),
       h('span', { class: 'score-of', text: `of ${report.applicable}` }),
     ),
-    h('p', { class: 'score-label', text: skipped > 0 ? `checks passed. ${skipped} did not apply to this plan.` : 'checks passed' }),
+    h('p', {
+      class: 'score-label',
+      text: skipped > 0 ? `checks passed. ${skipped} did not apply to this plan.` : 'checks passed',
+    }),
     bar,
     h('ul', { class: 'legend' },
       order.map((status) =>
@@ -61,18 +105,30 @@ function renderSummary(report, source) {
     h('dl', { class: 'meta' },
       h('dt', { text: 'Plan' }), h('dd', { text: source.label }),
       h('dt', { text: 'Resources read' }), h('dd', { text: String(source.meta.total) }),
-      source.meta.terraformVersion ? [h('dt', { text: 'Terraform' }), h('dd', { text: source.meta.terraformVersion })] : null,
-      h('dt', { text: 'Checked' }), h('dd', { text: new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) }),
+      source.meta.terraformVersion
+        ? [h('dt', { text: 'Terraform' }), h('dd', { text: source.meta.terraformVersion })]
+        : null,
+      h('dt', { text: 'Checked' }),
+      h('dd', { text: new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) }),
       h('dt', { text: 'Standard' }), h('dd', { text: 'NIST SP 800-171 Rev 2' }),
     ),
-    h('button', { type: 'button', class: 'button button-primary print-button', onclick: printReport, text: 'Print or save as PDF' }),
+    h('button', {
+      type: 'button',
+      class: 'button button-primary print-button',
+      onclick: printReport,
+      text: 'Print or save as PDF',
+    }),
   );
 }
 
 function printReport() {
   // Open every finding so the printed report is complete.
   for (const d of document.querySelectorAll('.check details')) d.open = true;
-  try { window.print(); } catch { /* printing is unavailable in some embedded previews */ }
+  try {
+    window.print();
+  } catch {
+    /* printing is unavailable in some embedded previews */
+  }
 }
 
 // ---------- Findings ----------
@@ -87,7 +143,9 @@ function renderCheck(check) {
     } catch {
       copy.textContent = 'Select and copy';
     }
-    setTimeout(() => { copy.textContent = 'Copy'; }, 1800);
+    setTimeout(() => {
+      copy.textContent = 'Copy';
+    }, 1800);
   });
 
   return h('li', { class: 'check', 'data-status': check.status },
@@ -164,27 +222,46 @@ function run(parse, label, sample) {
 async function loadFile(file) {
   if (!file) return;
   const text = await file.text();
+  if (location.hash.replace(/^#/, '') !== 'check') location.hash = 'check';
   run(() => parsePlanText(text), file.name, false);
-  $('results-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 const input = $('plan-file');
-input.addEventListener('change', () => { loadFile(input.files[0]); input.value = ''; });
+input.addEventListener('change', () => {
+  loadFile(input.files[0]);
+  input.value = '';
+});
 
 const drop = $('drop-zone');
 for (const type of ['dragenter', 'dragover']) {
-  drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.add('is-over'); });
+  drop.addEventListener(type, (event) => {
+    event.preventDefault();
+    drop.classList.add('is-over');
+  });
 }
 for (const type of ['dragleave', 'drop']) {
-  drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.remove('is-over'); });
+  drop.addEventListener(type, (event) => {
+    event.preventDefault();
+    drop.classList.remove('is-over');
+  });
 }
 drop.addEventListener('drop', (event) => loadFile(event.dataTransfer?.files?.[0]));
-// A file dropped anywhere else on the page should not navigate away from it.
+
+// A file dropped anywhere else on the page should load too, rather than navigating away.
 window.addEventListener('dragover', (event) => event.preventDefault());
-window.addEventListener('drop', (event) => event.preventDefault());
+window.addEventListener('drop', (event) => {
+  event.preventDefault();
+  const file = event.dataTransfer?.files?.[0];
+  if (file) loadFile(file);
+});
 
 $('sample-insecure').addEventListener('click', () => run(() => parsePlan(insecurePlan), 'Sample with problems', true));
 $('sample-fixed').addEventListener('click', () => run(() => parsePlan(fixedPlan), 'Sample after fixes', true));
 
-// Open in a working state: show the sample with problems until the visitor loads their own plan.
+// ---------- Start ----------
+
+renderChecksTable();
+$('statement').textContent = DISCLAIMER;
+// The check section opens in a working state, showing the sample with problems.
 run(() => parsePlan(insecurePlan), 'Sample with problems', true);
+routeFromHash();

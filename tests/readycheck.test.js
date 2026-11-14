@@ -1,6 +1,7 @@
 // Run with: npm test   (needs Node 20 or newer, no dependencies)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { parsePlan, parsePlanText, PlanError } from '../src/parser.js';
 import { buildReport } from '../src/report.js';
@@ -188,4 +189,20 @@ test('10 transit: plain HTTP fails; HTTP that redirects to HTTPS passes', () => 
     'pass',
   );
   assert.equal(statusOf(listener({ port: 443, protocol: 'HTTPS', default_action: [{ type: 'forward' }] }), 'transit-encryption'), 'pass');
+});
+
+// ---------- Real plans (made with `terraform plan` + `terraform show -json`) ----------
+// The two sample plans above are hand-built. These two came from real Terraform
+// (v1.16.6, AWS provider 5.x) using fixtures/insecure and fixtures/fixed.
+
+const realPlan = (name) => parsePlanText(readFileSync(new URL(`../samples/${name}`, import.meta.url), 'utf8'));
+
+test('real insecure plan from Terraform fails all ten checks', () => {
+  const report = buildReport(realPlan('real-insecure-plan.json').resources);
+  assert.deepEqual(report.checks.map((c) => [c.id, c.status]), checks.map((c) => [c.id, 'fail']));
+});
+
+test('real fixed plan from Terraform passes all ten checks', () => {
+  const report = buildReport(realPlan('real-fixed-plan.json').resources);
+  assert.deepEqual(report.checks.map((c) => [c.id, c.status]), checks.map((c) => [c.id, 'pass']));
 });

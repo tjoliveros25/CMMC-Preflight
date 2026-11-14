@@ -1,0 +1,966 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_s3_bucket.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "cui_data",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-defense-cui",
+            "acl": "private"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "cui_data",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-defense-cui",
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "cui_data",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-defense-cui"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_s3_bucket.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-defense-logs"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-defense-logs",
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_ebs_volume.app_data",
+          "mode": "managed",
+          "type": "aws_ebs_volume",
+          "name": "app_data",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "availability_zone": "us-east-1a",
+            "size": 50,
+            "encrypted": true
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_db_instance.records",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "records",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "engine": "postgres",
+            "instance_class": "db.t3.medium",
+            "allocated_storage": 50,
+            "storage_encrypted": true,
+            "publicly_accessible": false
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_vpc.main",
+          "mode": "managed",
+          "type": "aws_vpc",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "cidr_block": "10.0.0.0/16"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_flow_log.main",
+          "mode": "managed",
+          "type": "aws_flow_log",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "traffic_type": "ALL",
+            "log_destination_type": "s3"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_security_group.web",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "web",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "web-sg",
+            "ingress": [
+              {
+                "from_port": 22,
+                "to_port": 22,
+                "protocol": "tcp",
+                "cidr_blocks": [
+                  "10.0.0.0/16"
+                ],
+                "ipv6_cidr_blocks": []
+              },
+              {
+                "from_port": 443,
+                "to_port": 443,
+                "protocol": "tcp",
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6_cidr_blocks": []
+              }
+            ]
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_cloudtrail.main",
+          "mode": "managed",
+          "type": "aws_cloudtrail",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "org-trail",
+            "is_multi_region_trail": true,
+            "enable_log_file_validation": true
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_iam_policy.app",
+          "mode": "managed",
+          "type": "aws_iam_policy",
+          "name": "app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "app-policy",
+            "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:::acme-defense-cui/*\"}]}"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_lb.web",
+          "mode": "managed",
+          "type": "aws_lb",
+          "name": "web",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "web",
+            "load_balancer_type": "application"
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_lb_listener.http",
+          "mode": "managed",
+          "type": "aws_lb_listener",
+          "name": "http",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "port": 80,
+            "protocol": "HTTP",
+            "default_action": [
+              {
+                "type": "redirect",
+                "redirect": [
+                  {
+                    "port": "443",
+                    "protocol": "HTTPS",
+                    "status_code": "HTTP_301"
+                  }
+                ]
+              }
+            ]
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_lb_listener.https",
+          "mode": "managed",
+          "type": "aws_lb_listener",
+          "name": "https",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "port": 443,
+            "protocol": "HTTPS",
+            "default_action": [
+              {
+                "type": "forward"
+              }
+            ]
+          },
+          "sensitive_values": {}
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.cui_data",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "cui_data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "acme-defense-cui",
+          "acl": "private"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.cui_data",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "cui_data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "acme-defense-cui",
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_server_side_encryption_configuration.cui_data",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "cui_data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "acme-defense-cui"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "acme-defense-logs"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "acme-defense-logs",
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_ebs_volume.app_data",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "name": "app_data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "availability_zone": "us-east-1a",
+          "size": 50,
+          "encrypted": true
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.records",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "records",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "engine": "postgres",
+          "instance_class": "db.t3.medium",
+          "allocated_storage": 50,
+          "storage_encrypted": true,
+          "publicly_accessible": false
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc.main",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "cidr_block": "10.0.0.0/16"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_flow_log.main",
+      "mode": "managed",
+      "type": "aws_flow_log",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "traffic_type": "ALL",
+          "log_destination_type": "s3"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "vpc_id": true,
+          "log_destination": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.web",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "web-sg",
+          "ingress": [
+            {
+              "from_port": 22,
+              "to_port": 22,
+              "protocol": "tcp",
+              "cidr_blocks": [
+                "10.0.0.0/16"
+              ],
+              "ipv6_cidr_blocks": []
+            },
+            {
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": []
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "vpc_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_cloudtrail.main",
+      "mode": "managed",
+      "type": "aws_cloudtrail",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "org-trail",
+          "is_multi_region_trail": true,
+          "enable_log_file_validation": true
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "s3_bucket_name": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_iam_policy.app",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "app-policy",
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:::acme-defense-cui/*\"}]}"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lb.web",
+      "mode": "managed",
+      "type": "aws_lb",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "web",
+          "load_balancer_type": "application"
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lb_listener.http",
+      "mode": "managed",
+      "type": "aws_lb_listener",
+      "name": "http",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "port": 80,
+          "protocol": "HTTP",
+          "default_action": [
+            {
+              "type": "redirect",
+              "redirect": [
+                {
+                  "port": "443",
+                  "protocol": "HTTPS",
+                  "status_code": "HTTP_301"
+                }
+              ]
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "load_balancer_arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lb_listener.https",
+      "mode": "managed",
+      "type": "aws_lb_listener",
+      "name": "https",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "port": 443,
+          "protocol": "HTTPS",
+          "default_action": [
+            {
+              "type": "forward"
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "load_balancer_arn": true,
+          "certificate_arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_s3_bucket.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "cui_data",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "constant_value": "acme-defense-cui"
+            },
+            "acl": {
+              "constant_value": "private"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "cui_data",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.cui_data.id",
+                "aws_s3_bucket.cui_data"
+              ]
+            },
+            "block_public_acls": {
+              "constant_value": true
+            },
+            "block_public_policy": {
+              "constant_value": true
+            },
+            "ignore_public_acls": {
+              "constant_value": true
+            },
+            "restrict_public_buckets": {
+              "constant_value": true
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.cui_data",
+          "mode": "managed",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "name": "cui_data",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.cui_data.id",
+                "aws_s3_bucket.cui_data"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_s3_bucket.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "logs",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "constant_value": "acme-defense-logs"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "logs",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            },
+            "block_public_acls": {
+              "constant_value": true
+            },
+            "block_public_policy": {
+              "constant_value": true
+            },
+            "ignore_public_acls": {
+              "constant_value": true
+            },
+            "restrict_public_buckets": {
+              "constant_value": true
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_ebs_volume.app_data",
+          "mode": "managed",
+          "type": "aws_ebs_volume",
+          "name": "app_data",
+          "provider_config_key": "aws",
+          "expressions": {
+            "availability_zone": {
+              "constant_value": "us-east-1a"
+            },
+            "size": {
+              "constant_value": 50
+            },
+            "encrypted": {
+              "constant_value": true
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_db_instance.records",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "records",
+          "provider_config_key": "aws",
+          "expressions": {
+            "engine": {
+              "constant_value": "postgres"
+            },
+            "instance_class": {
+              "constant_value": "db.t3.medium"
+            },
+            "allocated_storage": {
+              "constant_value": 50
+            },
+            "storage_encrypted": {
+              "constant_value": true
+            },
+            "publicly_accessible": {
+              "constant_value": false
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_vpc.main",
+          "mode": "managed",
+          "type": "aws_vpc",
+          "name": "main",
+          "provider_config_key": "aws",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.0.0.0/16"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_flow_log.main",
+          "mode": "managed",
+          "type": "aws_flow_log",
+          "name": "main",
+          "provider_config_key": "aws",
+          "expressions": {
+            "traffic_type": {
+              "constant_value": "ALL"
+            },
+            "log_destination_type": {
+              "constant_value": "s3"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
+            },
+            "log_destination": {
+              "references": [
+                "aws_s3_bucket.logs.arn",
+                "aws_s3_bucket.logs"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_security_group.web",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "web",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "web-sg"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_cloudtrail.main",
+          "mode": "managed",
+          "type": "aws_cloudtrail",
+          "name": "main",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "org-trail"
+            },
+            "is_multi_region_trail": {
+              "constant_value": true
+            },
+            "enable_log_file_validation": {
+              "constant_value": true
+            },
+            "s3_bucket_name": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_iam_policy.app",
+          "mode": "managed",
+          "type": "aws_iam_policy",
+          "name": "app",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "app-policy"
+            },
+            "policy": {
+              "constant_value": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:::acme-defense-cui/*\"}]}"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_lb.web",
+          "mode": "managed",
+          "type": "aws_lb",
+          "name": "web",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "web"
+            },
+            "load_balancer_type": {
+              "constant_value": "application"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_lb_listener.http",
+          "mode": "managed",
+          "type": "aws_lb_listener",
+          "name": "http",
+          "provider_config_key": "aws",
+          "expressions": {
+            "port": {
+              "constant_value": 80
+            },
+            "protocol": {
+              "constant_value": "HTTP"
+            },
+            "load_balancer_arn": {
+              "references": [
+                "aws_lb.web.arn",
+                "aws_lb.web"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_lb_listener.https",
+          "mode": "managed",
+          "type": "aws_lb_listener",
+          "name": "https",
+          "provider_config_key": "aws",
+          "expressions": {
+            "port": {
+              "constant_value": 443
+            },
+            "protocol": {
+              "constant_value": "HTTPS"
+            },
+            "load_balancer_arn": {
+              "references": [
+                "aws_lb.web.arn",
+                "aws_lb.web"
+              ]
+            }
+          },
+          "schema_version": 0
+        }
+      ],
+      "module_calls": {}
+    }
+  }
+}

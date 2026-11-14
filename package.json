@@ -1,0 +1,14 @@
+{
+  "name": "readycheck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A free first-pass CMMC readiness check for AWS Terraform plans. Runs entirely in the browser.",
+  "scripts": {
+    "test": "node --test",
+    "start": "npx --yes serve ."
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

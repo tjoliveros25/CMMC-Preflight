@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReadyCheck</title>
+  <meta name="description" content="A free first-pass CMMC readiness check for AWS Terraform plans. Your plan is read in your browser and is not uploaded.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 2.5 4.5 7v8.6c0 6.6 4.6 11.6 11.5 13.9 6.900-2.300 11.500-7.300 11.500-13.900V7L16 2.500Z" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"></path>
+          <path d="m10.500 16.200 4 4 7.200-8" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <div>
+          <h1>ReadyCheck</h1>
+          <p class="tagline">A first-pass CMMC readiness check for AWS Terraform plans</p>
+        </div>
+      </div>
+      <p class="privacy">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.500 9V6.500a4.500 4.500 0 0 1 9 0V9M4.500 9h11v8h-11z" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round"></path></svg>
+        Your file is read in your browser and is not uploaded.
+      </p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="rail">
+      <section class="panel intake" aria-labelledby="intake-heading">
+        <h2 id="intake-heading">Check a plan</h2>
+        <label class="drop" id="drop-zone" for="plan-file">
+          <strong>Drop plan.json here</strong>
+          <span>or choose a file</span>
+          <input type="file" id="plan-file" accept=".json,application/json">
+        </label>
+        <details class="howto">
+          <summary>How to export a plan</summary>
+          <p>Run these two commands in your Terraform folder, then drop the resulting file above.</p>
+          <pre><code>terraform plan -out=tfplan
+terraform show -json tfplan &gt; plan.json</code></pre>
+        </details>
+        <div class="samples">
+          <p>No plan to hand? Try a sample.</p>
+          <div class="sample-buttons">
+            <button type="button" id="sample-insecure" class="button">Sample with problems</button>
+            <button type="button" id="sample-fixed" class="button">Sample after fixes</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel summary" id="summary" aria-live="polite" aria-labelledby="summary-heading"></section>
+    </aside>
+
+    <section class="results" aria-labelledby="results-heading">
+      <div id="notice" role="status"></div>
+      <div class="results-head">
+        <h2 id="results-heading">Findings</h2>
+        <p id="results-sub" class="results-sub"></p>
+      </div>
+      <ol id="findings" class="findings"></ol>
+      <p class="disclaimer" id="disclaimer"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>ReadyCheck is a free, open readiness aid. It is not affiliated with the Department of Defense, NIST, or the Cyber AB.</p>
+  </footer>
+
+  <script type="module" src="src/ui.js"></script>
+</body>
+</html>

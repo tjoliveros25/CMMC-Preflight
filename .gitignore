@@ -1,0 +1,10 @@
+node_modules/
+.vercel/
+.DS_Store
+
+# Terraform working files. Never commit real plans: they can contain secrets.
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan
+plan.json

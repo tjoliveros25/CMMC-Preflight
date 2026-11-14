@@ -23,12 +23,12 @@ provider "aws" {
 }
 
 # 1. Storage with public access blocked
-resource "aws_s3_bucket" "drawings" {
-  bucket = "acme-drawings-archive"
+resource "aws_s3_bucket" "cui_data" {
+  bucket = "acme-defense-cui"
 }
 
-resource "aws_s3_bucket_public_access_block" "drawings" {
-  bucket                  = aws_s3_bucket.drawings.id
+resource "aws_s3_bucket_public_access_block" "cui_data" {
+  bucket                  = aws_s3_bucket.cui_data.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -36,7 +36,7 @@ resource "aws_s3_bucket_public_access_block" "drawings" {
 }
 
 resource "aws_s3_bucket" "logs" {
-  bucket = "acme-logs"
+  bucket = "acme-defense-logs"
 }
 
 resource "aws_s3_bucket_public_access_block" "logs" {
@@ -48,13 +48,13 @@ resource "aws_s3_bucket_public_access_block" "logs" {
 }
 
 # 2. Encrypted disks
-resource "aws_ebs_volume" "data" {
+resource "aws_ebs_volume" "app_data" {
   availability_zone = "us-east-1a"
   size              = 200
   encrypted         = true
 }
 
-resource "aws_instance" "app" {
+resource "aws_instance" "app_server" {
   ami           = "ami-00000000000000000"
   instance_type = "t3.medium"
 
@@ -65,11 +65,11 @@ resource "aws_instance" "app" {
 }
 
 # 3 and 4. Encrypted database with no public address
-resource "aws_db_instance" "orders" {
+resource "aws_db_instance" "records" {
   engine              = "postgres"
   instance_class      = "db.t3.medium"
   allocated_storage   = 100
-  username            = "orders"
+  username            = "records"
   password            = "change-me-placeholder"
   storage_encrypted   = true
   publicly_accessible = false
@@ -130,7 +130,7 @@ resource "aws_iam_policy" "ops" {
     Statement = [{
       Effect   = "Allow"
       Action   = ["s3:GetObject", "s3:PutObject"]
-      Resource = "arn:aws:s3:::acme-drawings-archive/*"
+      Resource = "arn:aws:s3:::acme-defense-cui/*"
     }]
   })
 }

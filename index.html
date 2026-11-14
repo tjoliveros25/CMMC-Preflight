@@ -4,31 +4,172 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ReadyCheck</title>
-  <meta name="description" content="A free first-pass CMMC readiness check for AWS Terraform plans. Your plan is read in your browser and is not uploaded.">
+  <meta name="description" content="A free first-pass CMMC readiness check for small defense suppliers. Drop in an AWS Terraform plan and get a plain-English report. Your file is read in your browser and is not uploaded.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="masthead">
     <div class="masthead-inner">
-      <div class="brand">
+      <a class="brand" href="#overview">
         <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M16 2.5 4.5 7v8.6c0 6.6 4.6 11.6 11.5 13.9 6.900-2.300 11.500-7.300 11.500-13.900V7L16 2.500Z" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"></path>
-          <path d="m10.500 16.200 4 4 7.200-8" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M16 2.5 4.5 7v8.6c0 6.6 4.6 11.6 11.5 13.9 6.9-2.3 11.5-7.3 11.5-13.9V7L16 2.5Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"></path>
+          <path d="m10.5 16.2 4 4 7.2-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>
-        <div>
-          <h1>ReadyCheck</h1>
-          <p class="tagline">A first-pass CMMC readiness check for AWS Terraform plans</p>
-        </div>
-      </div>
-      <p class="privacy">
-        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.500 9V6.500a4.500 4.500 0 0 1 9 0V9M4.500 9h11v8h-11z" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round"></path></svg>
-        Your file is read in your browser and is not uploaded.
-      </p>
+        <span>
+          <strong>ReadyCheck</strong>
+          <small>CMMC readiness for small defense suppliers</small>
+        </span>
+      </a>
+      <nav class="tabs" id="tabs" aria-label="Sections">
+        <a href="#overview" data-view="overview">Overview</a>
+        <a href="#check" data-view="check">Run a check</a>
+        <a href="#checks" data-view="checks">The 10 checks</a>
+        <a href="#limits" data-view="limits">Limits &amp; FAQ</a>
+      </nav>
     </div>
   </header>
 
-  <main class="layout">
+  <!-- ============================ OVERVIEW ============================ -->
+  <main id="view-overview" class="view page">
+    <section class="hero">
+      <p class="eyebrow">Free, and nothing leaves your browser</p>
+      <h1>Find the cloud settings that will fail your CMMC self-assessment, before an assessor does.</h1>
+      <p class="lede">
+        Drop in a Terraform plan for your AWS setup. ReadyCheck reads it in your browser and returns a
+        plain-English report on 10 settings tied to NIST SP 800-171, with the fix for each one.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary button-large" href="#check">Run a check</a>
+        <a class="button button-large" href="#checks">See what it checks</a>
+      </div>
+      <p class="hero-note">No account, no upload, no cost. It is a readiness check, not a certification.</p>
+    </section>
+
+    <section class="band">
+      <h2>The problem</h2>
+      <p class="band-lede">
+        Companies that handle sensitive defense information have to protect it to a federal standard.
+        Proving it costs more than many small shops make on the contract.
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num">$593,800</span>
+          <span class="stat-label">SBA's estimate of total compliance cost per certification for a small firm</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">120,000+</span>
+          <span class="stat-label">Small businesses in the defense industrial base facing the requirement</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">~100</span>
+          <span class="stat-label">Approved assessors available to serve all of them</span>
+        </div>
+      </div>
+      <p class="fineprint">
+        The Department of War suspended the third-party certification phase in July 2026, citing exactly this
+        cost. The requirements themselves did not go away: DFARS 252.204-7012 still applies, self-assessments
+        are still required, and primes still push the obligations down to their subcontractors. A separate DoD
+        cost model puts the assessment alone at $101,752 for a small entity, while a PreVeil survey found 3 in 5
+        contractors had budgeted under $50,000. Sources are listed at the bottom of this page.
+      </p>
+    </section>
+
+    <section class="band">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-num">1</span>
+          <h3>Export your plan</h3>
+          <p>Two commands in your Terraform folder produce a <code>plan.json</code> describing your AWS setup.</p>
+          <pre><code>terraform plan -out=tfplan
+terraform show -json tfplan &gt; plan.json</code></pre>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <h3>Drop it in</h3>
+          <p>
+            The file is read by code running in your own browser. It is never uploaded, there is no server to
+            send it to, and the site is served with a header that forbids the page from making outbound
+            connections. Open your browser's network tab and watch.
+          </p>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <h3>Read the report</h3>
+          <p>
+            Every finding names the resource, says why it matters in one sentence, cites the NIST requirement,
+            and gives you Terraform you can paste. Print it or save it as a PDF for your file.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="band">
+      <h2>Who it is for</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Small suppliers</h3>
+          <p>Shops that have been handed a compliance obligation by a prime and no budget to meet it.</p>
+        </div>
+        <div class="card">
+          <h3>Their IT providers</h3>
+          <p>The managed service providers who actually run that cloud, and who can act on the findings today.</p>
+        </div>
+        <div class="card">
+          <h3>Prime contractors</h3>
+          <p>A free, readable starting point to hand down the supply chain instead of a 110-row spreadsheet.</p>
+        </div>
+        <div class="card">
+          <h3>The supply chain</h3>
+          <p>Every small shop that stays in business is a supplier the defense industrial base keeps.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>What it is, and what it is not</h2>
+      <div class="two-up">
+        <div class="col">
+          <h3 class="col-head is-good">What it does</h3>
+          <ul class="ticks">
+            <li>Reads a real Terraform plan, including resources inside modules</li>
+            <li>Checks 10 technical settings and maps each to a NIST SP 800-171 Rev 2 requirement</li>
+            <li>Explains each finding in plain English, with a fix you can paste</li>
+            <li>Says "could not determine" rather than guessing when the plan does not settle a value</li>
+            <li>Runs entirely in your browser, so the file never leaves your machine</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3 class="col-head is-bad">What it does not do</h3>
+          <ul class="crosses">
+            <li>It is not a certification and does not replace a real assessment</li>
+            <li>It covers 10 of 110 requirements, all technical. Policy, training and physical security are not here</li>
+            <li>It reads what the plan says will be built, not what is running in your account today</li>
+            <li>It produces no SPRS score, and a pass does not mean a requirement is met</li>
+            <li>It needs Terraform, which the smallest shops may not use</li>
+          </ul>
+        </div>
+      </div>
+      <p class="fineprint">
+        Free scanners for Terraform already exist and carry hundreds of rules. They are written for engineers.
+        ReadyCheck is written for the person who has to fill in the self-assessment.
+      </p>
+    </section>
+
+    <section class="band band-sources">
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li><a href="https://www.sba.gov/article/2026/07/13/sba-commends-us-department-wars-suspension-cmmc-phase-ii-small-defense-contractors">SBA — statement on the suspension of CMMC Phase II</a>, for the cost, business count and assessor count</li>
+        <li><a href="https://www.lw.com/en/insights/what-defense-contractors-should-know-about-dod-suspension-of-cmmc-phase-2">Latham &amp; Watkins — what the Phase 2 suspension changed</a></li>
+        <li><a href="https://www.preveil.com/blog/the-cmmc-affordability-gap/">PreVeil — the CMMC affordability gap</a>, for the budget survey and the $101,752 figure</li>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final">NIST SP 800-171 Revision 2</a>, the 110 requirements themselves</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- ============================ RUN A CHECK ============================ -->
+  <main id="view-check" class="view layout" hidden>
     <aside class="rail">
       <section class="panel intake" aria-labelledby="intake-heading">
         <h2 id="intake-heading">Check a plan</h2>
@@ -37,6 +178,10 @@
           <span>or choose a file</span>
           <input type="file" id="plan-file" accept=".json,application/json">
         </label>
+        <p class="privacy-inline">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 9V6.5a4.5 4.5 0 0 1 9 0V9M4.5 9h11v8h-11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          Read in your browser. Not uploaded.
+        </p>
         <details class="howto">
           <summary>How to export a plan</summary>
           <p>Run these two commands in your Terraform folder, then drop the resulting file above.</p>
@@ -49,6 +194,9 @@ terraform show -json tfplan &gt; plan.json</code></pre>
             <button type="button" id="sample-insecure" class="button">Sample with problems</button>
             <button type="button" id="sample-fixed" class="button">Sample after fixes</button>
           </div>
+          <p class="download-line">
+            <a href="example-plan.json" download>Download the example plan</a> to try the drag-and-drop yourself.
+          </p>
         </div>
       </section>
 
@@ -66,8 +214,115 @@ terraform show -json tfplan &gt; plan.json</code></pre>
     </section>
   </main>
 
+  <!-- ============================ THE 10 CHECKS ============================ -->
+  <main id="view-checks" class="view page" hidden>
+    <section class="hero hero-tight">
+      <h1>The 10 checks</h1>
+      <p class="lede">
+        Each one reads a setting out of your Terraform plan and maps it to a requirement in NIST SP 800-171
+        Revision 2. The requirement numbers below are our mapping, not an official one.
+      </p>
+    </section>
+    <section class="band">
+      <div class="table-wrap">
+        <table class="checks-table" id="checks-table">
+          <thead>
+            <tr><th scope="col">#</th><th scope="col">Check</th><th scope="col">Why it matters</th><th scope="col">NIST</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="fineprint">
+        NIST SP 800-171 Revision 2 has 110 requirements across 14 families. A Terraform plan can only show
+        evidence for the technical ones. Everything about people, paperwork and physical space has to be
+        answered another way.
+      </p>
+      <p><a class="button button-primary" href="#check">Run these against a plan</a></p>
+    </section>
+  </main>
+
+  <!-- ============================ LIMITS & FAQ ============================ -->
+  <main id="view-limits" class="view page" hidden>
+    <section class="hero hero-tight">
+      <h1>Limits &amp; FAQ</h1>
+      <p class="lede">What this tool can honestly tell you, and what it cannot.</p>
+    </section>
+
+    <section class="band">
+      <blockquote class="statement" id="statement"></blockquote>
+    </section>
+
+    <section class="band">
+      <h2>Questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Only 10 of 110 requirements?</summary>
+          <p>
+            Yes. We built the part a scanner can automate: technical configuration. The other 100 requirements
+            cover policy, training, personnel screening, physical security and incident response, which no tool
+            can read out of a cloud configuration file. Ten checks you can trust is more useful than a hundred
+            you cannot.
+          </p>
+        </details>
+        <details>
+          <summary>Why not use Checkov, Terrascan or KICS?</summary>
+          <p>
+            Use them, they are good. They carry hundreds of rules and they are written for engineers, producing
+            rule IDs and severity levels. ReadyCheck answers a different question: what do I write in the
+            self-assessment, and which requirement does this affect? That is why every finding here is one plain
+            sentence with a requirement number and a fix.
+          </p>
+        </details>
+        <details>
+          <summary>Would I really upload a file describing my network?</summary>
+          <p>
+            You do not upload it. The checks run as JavaScript in your own browser, there is no server
+            component, and the site is served with a Content Security Policy that forbids the page from opening
+            any outbound connection. Open your browser's network tab while you load a plan and you will see no
+            requests. The code is open, so you can confirm it rather than take our word.
+          </p>
+        </details>
+        <details>
+          <summary>CMMC is paused. Does any of this still matter?</summary>
+          <p>
+            Only third-party certification is paused. The 110 requirements of NIST SP 800-171 still apply to
+            anyone handling controlled unclassified information under DFARS 252.204-7012, Phase 1
+            self-assessments and SPRS scores are still required, and prime contractors still flow the
+            obligations down to their subcontractors.
+          </p>
+        </details>
+        <details>
+          <summary>What does "could not determine" mean?</summary>
+          <p>
+            Terraform marks some values as decided only when the plan is applied, and some settings depend on
+            account-wide defaults a plan does not show. Rather than guess, we say so. A wrong pass is the worst
+            thing a readiness tool can give you.
+          </p>
+        </details>
+        <details>
+          <summary>Does a pass mean I meet the requirement?</summary>
+          <p>
+            No. It means this one setting, in this plan, looks right. An assessor will want to see the policy
+            behind it, evidence that it is enforced, and that it covers every system in scope, not just the ones
+            Terraform builds. Each finding lists what it does not prove for that reason.
+          </p>
+        </details>
+        <details>
+          <summary>AWS only?</summary>
+          <p>
+            For now. The checks read AWS resource types. Azure would be a second set of check files against the
+            same parser and the same report, which is the next thing we would build.
+          </p>
+        </details>
+      </div>
+    </section>
+  </main>
+
   <footer class="footer">
-    <p>ReadyCheck is a free, open readiness aid. It is not affiliated with the Department of Defense, NIST, or the Cyber AB.</p>
+    <p>
+      ReadyCheck is a free, open readiness aid. It is not affiliated with the Department of Defense,
+      the Department of War, NIST, or the Cyber AB.
+    </p>
   </footer>
 
   <script type="module" src="src/ui.js"></script>

@@ -25,27 +25,27 @@ provider "aws" {
 }
 
 # 1. Public storage, and no public access block on either bucket
-resource "aws_s3_bucket" "drawings" {
-  bucket = "acme-drawings-archive"
+resource "aws_s3_bucket" "cui_data" {
+  bucket = "acme-defense-cui"
 }
 
-resource "aws_s3_bucket_acl" "drawings" {
-  bucket = aws_s3_bucket.drawings.id
+resource "aws_s3_bucket_acl" "cui_data" {
+  bucket = aws_s3_bucket.cui_data.id
   acl    = "public-read"
 }
 
 resource "aws_s3_bucket" "logs" {
-  bucket = "acme-logs"
+  bucket = "acme-defense-logs"
 }
 
 # 2. Unencrypted disks
-resource "aws_ebs_volume" "data" {
+resource "aws_ebs_volume" "app_data" {
   availability_zone = "us-east-1a"
   size              = 200
   encrypted         = false
 }
 
-resource "aws_instance" "app" {
+resource "aws_instance" "app_server" {
   ami           = "ami-00000000000000000"
   instance_type = "t3.medium"
 
@@ -56,11 +56,11 @@ resource "aws_instance" "app" {
 }
 
 # 3 and 4. Unencrypted database with a public address
-resource "aws_db_instance" "orders" {
+resource "aws_db_instance" "records" {
   engine              = "postgres"
   instance_class      = "db.t3.medium"
   allocated_storage   = 100
-  username            = "orders"
+  username            = "records"
   password            = "change-me-placeholder"
   storage_encrypted   = false
   publicly_accessible = true

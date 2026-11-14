@@ -18,11 +18,13 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 
 | Path | What it holds | Owner |
 | --- | --- | --- |
+| `index.html` | Four sections: Overview, Run a check, The 10 checks, Limits & FAQ | Report |
 | `src/parser.js` | Reads the plan JSON into a flat resource list | Parser |
 | `src/checks/` | One file per check, plus shared helpers | Checks |
 | `src/content.js` | All report wording, requirement numbers, fix snippets | Report |
-| `src/report.js`, `src/ui.js`, `styles.css`, `index.html` | Report model and page | Report |
-| `samples/` | Two built-in sample plans (synthetic, see below) | Parser |
+| `src/report.js`, `src/ui.js`, `styles.css` | Report model, section routing, and styling | Report |
+| `samples/` | Sample plans, all defined in `samples/definitions.js` (synthetic, see below) | Parser |
+| `example-plan.json` | The downloadable example offered on the Run a check page | Parser |
 | `fixtures/` | Terraform source for the insecure and fixed plans | Parser |
 | `tests/` | Unit tests | Everyone |
 | `vercel.json` | Security headers for hosting | Demo |
@@ -41,7 +43,9 @@ disk will show a blank report.
 
 ## Deploy to Vercel
 
-1. Push this folder to a GitHub repository.
+1. Push this folder to a GitHub repository. The repository already has a commit and the
+   branches `main`, `tristan`, `mathew` and `manuel`; run `push-to-github.ps1` on Windows or
+   `push-to-github.sh` on Mac, Linux or Git Bash.
 2. In Vercel, choose Add New, then Project, and import the repository.
 3. Framework preset: **Other**. Leave the build command and output directory empty.
 4. Deploy.

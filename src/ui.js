@@ -422,6 +422,19 @@ async function loadExample(example, button) {
   }
 }
 
+function renderStartChecks() {
+  $('start-checks').replaceChildren(
+    ...checks.map((check, index) => {
+      const entry = content[check.id];
+      return h('li', {},
+        h('span', { class: 'start-check-num', text: two(index + 1) }),
+        h('span', { class: 'start-check-title', text: entry.title }),
+        h('span', { class: 'start-check-reqs' }, entry.requirements.map((r) => h('span', { class: 'req', text: r }))),
+      );
+    }),
+  );
+}
+
 function renderExamples() {
   // Compact buttons in the rail, and fuller cards on the idle screen.
   $('example-buttons').replaceChildren(
@@ -723,10 +736,24 @@ function showIdle() {
   $('disclaimer').hidden = true;
   $('notice').replaceChildren();
   $('results-sub').textContent = 'Pick an example or drop a plan to begin.';
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  ring.setAttribute('viewBox', '0 0 120 120');
+  ring.setAttribute('class', 'ring ring-empty');
+  ring.setAttribute('aria-hidden', 'true');
+  const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  for (const [k, v] of Object.entries({ class: 'ring-track', cx: '60', cy: '60', r: '52', fill: 'none', 'stroke-width': '12', 'stroke-dasharray': '6 10', 'stroke-linecap': 'round' })) {
+    track.setAttribute(k, v);
+  }
+  ring.append(track);
+
   $('summary').replaceChildren(
     h('h2', { id: 'summary-heading', text: 'Result' }),
-    h('p', { class: 'rail-idle', text: 'No plan checked yet.' }),
-    h('p', { class: 'rail-idle-note', text: 'Your result, the 10 findings and the fixes appear here.' }),
+    h('div', { class: 'ring-wrap ring-wrap-lg' },
+      ring,
+      h('div', { class: 'ring-centre' }, h('span', { class: 'ring-dash', text: '\u2013' })),
+    ),
+    h('p', { class: 'rail-idle', text: 'No plan checked yet' }),
+    h('p', { class: 'rail-idle-note', text: 'Your score, the ten findings and the fixes appear here once you load a plan.' }),
   );
 }
 
@@ -814,6 +841,26 @@ const setAllOpen = (open) => {
 $('expand-all').addEventListener('click', () => setAllOpen(true));
 $('collapse-all').addEventListener('click', () => setAllOpen(false));
 
+// ---------- FAQ accordion ----------
+
+// A button and a panel rather than <details>, so closing animates as well as opening.
+// The panel is a grid whose single row goes from 0fr to 1fr, which transitions cleanly
+// without anyone having to measure a height.
+function setupFaq() {
+  for (const button of document.querySelectorAll('.faq-q')) {
+    const panel = $(button.getAttribute('aria-controls'));
+    button.addEventListener('click', () => {
+      const open = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', open ? 'false' : 'true');
+      panel.classList.toggle('is-open', !open);
+      button.closest('.faq-item').classList.toggle('is-open', !open);
+    });
+  }
+  // Open the first one so the section does not read as a wall of closed bars.
+  const first = document.querySelector('.faq-q');
+  if (first) first.click();
+}
+
 // ---------- Shortcut help ----------
 
 const sheet = $('help-sheet');
@@ -881,7 +928,9 @@ renderChecksTable();
 renderCoverage();
 $('statement').textContent = DISCLAIMER;
 // The check section opens in a working state, showing the sample with problems.
+setupFaq();
 renderExamples();
+renderStartChecks();
 showIdle();
 routeFromHash();
 countUpStats();

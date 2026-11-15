@@ -295,6 +295,15 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           Whatever you load is read in this browser and is not uploaded.
           <a href="#security">How that is enforced</a>.
         </p>
+
+        <div class="start-preview">
+          <h4>What the report will cover</h4>
+          <ol class="start-checks" id="start-checks"></ol>
+          <p class="start-preview-foot">
+            Ten settings, each mapped to NIST SP 800-171 Revision 2, each with the Terraform to fix it.
+            <a href="#checks">See how these sit in the standard</a>.
+          </p>
+        </div>
       </section>
 
       <ol id="findings" class="findings"></ol>
@@ -478,66 +487,70 @@ Referrer-Policy: no-referrer</code></pre>
 
     <section class="band">
       <h2>Questions</h2>
-      <div class="faq">
-        <details open>
-          <summary>Only 10 of 110 requirements?</summary>
-          <p>
-            Yes. We built the part a scanner can automate: technical configuration. The other 100 requirements
-            cover policy, training, personnel screening, physical security and incident response, which no tool
-            can read out of a cloud configuration file. Ten checks you can trust is more useful than a hundred
-            you cannot.
-          </p>
-        </details>
-        <details>
-          <summary>Why not use Checkov, Terrascan or KICS?</summary>
-          <p>
-            Use them, they are good. They carry hundreds of rules and they are written for engineers, producing
-            rule IDs and severity levels. CMMC Preflight answers a different question: what do I write in the
-            self-assessment, and which requirement does this affect? That is why every finding here is one plain
-            sentence with a requirement number and a fix.
-          </p>
-        </details>
-        <details>
-          <summary>Would I really upload a file describing my network?</summary>
-          <p>
-            You do not upload it. The checks run as JavaScript in your own browser, there is no server
-            component, and the site is served with a Content Security Policy that forbids the page from opening
-            any outbound connection. Open your browser's network tab while you load a plan and you will see no
-            requests. The code is open, so you can confirm it rather than take our word.
-          </p>
-        </details>
-        <details>
-          <summary>CMMC is paused. Does any of this still matter?</summary>
-          <p>
-            Only third-party certification is paused. The 110 requirements of NIST SP 800-171 still apply to
-            anyone handling controlled unclassified information under DFARS 252.204-7012, Phase 1
-            self-assessments and SPRS scores are still required, and prime contractors still flow the
-            obligations down to their subcontractors.
-          </p>
-        </details>
-        <details>
-          <summary>What does "could not determine" mean?</summary>
-          <p>
-            Terraform marks some values as decided only when the plan is applied, and some settings depend on
-            account-wide defaults a plan does not show. Rather than guess, we say so. A wrong pass is the worst
-            thing a readiness tool can give you.
-          </p>
-        </details>
-        <details>
-          <summary>Does a pass mean I meet the requirement?</summary>
-          <p>
-            No. It means this one setting, in this plan, looks right. An assessor will want to see the policy
-            behind it, evidence that it is enforced, and that it covers every system in scope, not just the ones
-            Terraform builds. Each finding lists what it does not prove for that reason.
-          </p>
-        </details>
-        <details>
-          <summary>AWS only?</summary>
-          <p>
-            For now. The checks read AWS resource types. Azure would be a second set of check files against the
-            same parser and the same report, which is the next thing we would build.
-          </p>
-        </details>
+      <div class="faq" id="faq">
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-1-button" aria-expanded="false" aria-controls="faq-1-panel">
+            <span class="faq-text">Only 10 of 110 requirements?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-1-panel" role="region" aria-labelledby="faq-1-button">
+            <div class="faq-inner"><p>Yes. We built the part a scanner can automate: technical configuration. The other 100 requirements cover policy, training, personnel screening, physical security and incident response, which no tool can read out of a cloud configuration file. Ten checks you can trust is more useful than a hundred you cannot.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-2-button" aria-expanded="false" aria-controls="faq-2-panel">
+            <span class="faq-text">Why not use Checkov, Terrascan or KICS?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-2-panel" role="region" aria-labelledby="faq-2-button">
+            <div class="faq-inner"><p>Use them, they are good. They carry hundreds of rules and they are written for engineers, producing rule IDs and severity levels. CMMC Preflight answers a different question: what do I write in the self-assessment, and which requirement does this affect? That is why every finding here is one plain sentence with a requirement number and a fix.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-3-button" aria-expanded="false" aria-controls="faq-3-panel">
+            <span class="faq-text">Would I really upload a file describing my network?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-3-panel" role="region" aria-labelledby="faq-3-button">
+            <div class="faq-inner"><p>You do not upload it. The checks run as JavaScript in your own browser, there is no server component, and the site is served with a Content Security Policy that forbids the page from opening any outbound connection. Open your browser's network tab while you load a plan and you will see no requests. The code is open, so you can confirm it rather than take our word.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-4-button" aria-expanded="false" aria-controls="faq-4-panel">
+            <span class="faq-text">CMMC is paused. Does any of this still matter?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-4-panel" role="region" aria-labelledby="faq-4-button">
+            <div class="faq-inner"><p>Only third-party certification is paused. The 110 requirements of NIST SP 800-171 still apply to anyone handling controlled unclassified information under DFARS 252.204-7012, Phase 1 self-assessments and SPRS scores are still required, and prime contractors still flow the obligations down to their subcontractors.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-5-button" aria-expanded="false" aria-controls="faq-5-panel">
+            <span class="faq-text">What does "could not determine" mean?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-5-panel" role="region" aria-labelledby="faq-5-button">
+            <div class="faq-inner"><p>Terraform marks some values as decided only when the plan is applied, and some settings depend on account-wide defaults a plan does not show. Rather than guess, we say so. A wrong pass is the worst thing a readiness tool can give you.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-6-button" aria-expanded="false" aria-controls="faq-6-panel">
+            <span class="faq-text">Does a pass mean I meet the requirement?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-6-panel" role="region" aria-labelledby="faq-6-button">
+            <div class="faq-inner"><p>No. It means this one setting, in this plan, looks right. An assessor will want to see the policy behind it, evidence that it is enforced, and that it covers every system in scope, not just the ones Terraform builds. Each finding lists what it does not prove for that reason.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-7-button" aria-expanded="false" aria-controls="faq-7-panel">
+            <span class="faq-text">AWS only?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-7-panel" role="region" aria-labelledby="faq-7-button">
+            <div class="faq-inner"><p>For now. The checks read AWS resource types. Azure would be a second set of check files against the same parser and the same report, which is the next thing we would build.</p></div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

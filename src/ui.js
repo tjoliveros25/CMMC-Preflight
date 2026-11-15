@@ -240,6 +240,7 @@ function countUpStats() {
 
 // ---------- The checks table ----------
 
+// Built from content.js, same as the report, so the two can't drift apart.
 function renderChecksTable() {
   $('checks-table').querySelector('tbody').replaceChildren(
     ...checks.map((check, index) => {
@@ -612,6 +613,7 @@ function downloadReport() {
 
 // ---------- Findings ----------
 
+// Failing and unknown checks start open so problems are the first thing you see.
 function renderCheck(check) {
   const showFix = check.status === 'fail' || check.status === 'unknown';
   const copy = h('button', { type: 'button', class: 'button button-small', text: 'Copy' });
@@ -765,6 +767,7 @@ function showNotice(kind, title, text) {
 
 // ---------- Loading plans ----------
 
+// Bad file? Show the error and leave the last report on screen.
 function run(parse, label, sample) {
   try {
     const { resources, meta } = parse();
@@ -786,6 +789,7 @@ function run(parse, label, sample) {
   }
 }
 
+// file.text() reads it locally. Nothing is uploaded.
 async function loadFile(file) {
   if (!file) return;
   const text = await file.text();

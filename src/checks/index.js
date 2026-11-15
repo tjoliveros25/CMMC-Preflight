@@ -1,4 +1,5 @@
 // The ten checks, in report order.
+// Each one is just { id, run(resources) }. Adding a check = a new file here + its text in content.js.
 import storagePublic from './storage-public.js';
 import diskEncryption from './disk-encryption.js';
 import databaseEncryption from './database-encryption.js';

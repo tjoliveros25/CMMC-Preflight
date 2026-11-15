@@ -20,7 +20,11 @@ export const content = {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}`,
+}
+
+# If the bucket already has an aws_s3_bucket_acl set to public-read, change it too.
+# This check fails on a public ACL even when the block above is in place.
+#   acl = "private"`,
     messages: {
       no_buckets: () => 'This plan contains no storage buckets, so this check was skipped.',
       public_acl: (v) => `The storage bucket "${n(v)}" is set to be readable by anyone on the internet.`,
@@ -102,12 +106,16 @@ resource "aws_ebs_encryption_by_default" "all" {
     requirements: ['3.13.1', '3.13.6'],
     why: 'Open remote login ports are scanned constantly and are a common way in.',
     limits: 'That remote logins use multi-factor authentication, which is its own requirement (3.5.3).',
-    fix: () => `ingress {
+    fix: () => `# Do this for port 22 and for port 3389 (remote desktop):
+ingress {
   from_port   = 22
   to_port     = 22
   protocol    = "tcp"
   cidr_blocks = ["203.0.113.10/32"] # replace with your office address
-}`,
+}
+
+# Also remove or narrow any rule that allows all protocols from 0.0.0.0/0.
+# Such a rule opens ports 22 and 3389 too, so this check keeps failing.`,
     messages: {
       no_firewall: () => 'This plan contains no firewall rules, so this check was skipped.',
       open: (v) => `The firewall rule "${n(v)}" lets anyone on the internet attempt a remote login on port ${v.ports}.`,
@@ -176,16 +184,26 @@ resource "aws_ebs_encryption_by_default" "all" {
     requirements: ['3.1.5'],
     why: 'Anyone or anything holding a policy like this can read, change, or delete everything in the account.',
     limits: "That the remaining policies are as narrow as they should be, or who has AWS's own built-in administrator policy attached.",
-    fix: () => `# List only the actions and resources this role needs, for example:
-statement {
-  actions   = ["s3:GetObject", "s3:PutObject"]
-  resources = ["\${aws_s3_bucket.drawings.arn}/*"]
-}`,
+    fix: () => `resource "aws_iam_policy" "ops" {
+  name = "ops-drawings"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:GetObject", "s3:PutObject"]
+      Resource = "arn:aws:s3:::your-bucket-name/*"
+    }]
+  })
+}
+
+# Write the bucket name out in full. If the policy refers to another resource
+# (such as a bucket's arn), the plan cannot show its text yet and this tool
+# will report "could not determine".`,
     messages: {
       no_policies: () => 'This plan contains no permission policies, so this check was skipped.',
       blanket: (v) => `The permission policy "${n(v)}" allows every action on every resource.`,
       scoped: (v) => `None of the ${v.count} permission ${v.count === 1 ? 'policy' : 'policies'} in this plan grants unlimited access.`,
-      unknown: (v) => `We could not read the policy "${n(v)}". Its contents are only decided when the plan is applied.`,
+      unknown: (v) => `We could not read the policy "${n(v)}". Its contents are only decided when the plan is applied. This usually means the policy refers to another resource; writing the resource name out in full makes it readable.`,
       unreadable: (v) => `We could not read the policy "${n(v)}". It is not valid JSON.`,
     },
   },
@@ -196,8 +214,9 @@ statement {
     why: 'Unencrypted traffic can be read by anyone between the user and the server.',
     limits: 'That traffic between internal systems is encrypted.',
     fix: () => `resource "aws_lb_listener" "http" {
-  port     = 80
-  protocol = "HTTP"
+  load_balancer_arn = aws_lb.web.arn
+  port              = 80
+  protocol          = "HTTP"
   default_action {
     type = "redirect"
     redirect {

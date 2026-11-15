@@ -5,6 +5,7 @@ import { content } from './content.js';
 
 const SEVERITY = { fail: 0, unknown: 1, pass: 2, na: 3 };
 
+// A check is only as good as its worst finding. One public bucket fails the storage check.
 export function overallStatus(findings) {
   return findings.reduce((worst, f) => (SEVERITY[f.status] < SEVERITY[worst] ? f.status : worst), 'na');
 }
@@ -18,6 +19,7 @@ export function buildReport(resources) {
     }));
     findings.sort((a, b) => SEVERITY[a.status] - SEVERITY[b.status]);
     const status = overallStatus(findings);
+    // Put the first failing resource's name in the fix so it can be pasted as is.
     const firstProblem = findings.find((f) => f.status === 'fail' && f.vars.name);
     return {
       number: index + 1,

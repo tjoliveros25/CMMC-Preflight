@@ -43,17 +43,21 @@ export function parsePlan(plan) {
     throw new PlanError('not_plan', 'This JSON file is not a Terraform plan. It has no planned_values section.');
   }
 
+  // Which settings Terraform can't know until apply.
   const unknownByAddress = new Map();
   for (const rc of plan.resource_changes ?? []) {
     if (rc && rc.address) unknownByAddress.set(rc.address, rc.change?.after_unknown ?? {});
   }
 
+  // The config section tells us what points at what. Needed because in a real plan a bucket's id
+  // is unknown, so the only way to tie a public access block to its bucket is the reference.
   const configByAddress = new Map();
   collectConfig(plan.configuration?.root_module, '', configByAddress);
 
   const resources = [];
   collectResources(plan.planned_values.root_module, resources, unknownByAddress, configByAddress);
 
+  // AWS only for now.
   const awsCount = resources.filter((r) => r.type.startsWith('aws_')).length;
   if (awsCount === 0) {
     throw new PlanError(
@@ -84,6 +88,7 @@ function collectResources(module, out, unknownByAddress, configByAddress) {
     const refs = {};
     for (const [attr, expr] of Object.entries(expressions)) {
       if (expr && Array.isArray(expr.references)) {
+        // var. and local. aren't resources, so drop them.
         refs[attr] = expr.references
           .filter((ref) => !ref.startsWith('var.') && !ref.startsWith('local.'))
           .map((ref) => stripIndex(modulePrefix) + stripIndex(ref));

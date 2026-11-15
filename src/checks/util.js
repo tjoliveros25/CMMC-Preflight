@@ -9,6 +9,7 @@
 
 import { stripIndex } from '../parser.js';
 
+// All of IPv4 and all of IPv6.
 export const WORLD = new Set(['0.0.0.0/0', '::/0']);
 
 export const finding = (checkId, status, resource, reason, vars = {}) => ({
@@ -21,6 +22,7 @@ export const finding = (checkId, status, resource, reason, vars = {}) => ({
 
 export const ofType = (resources, ...types) => resources.filter((r) => types.includes(r.type));
 
+// "Known after apply" in Terraform terms. We report these instead of guessing.
 export const isUnknown = (resource, attr) => resource.unknown?.[attr] === true;
 
 // True when `resource[attr]` points at `target`, either through a reference in the
@@ -34,4 +36,5 @@ export function linkedTo(resource, attr, target, valueKeys = ['id']) {
   return valueKeys.some((key) => target.values?.[key] === value);
 }
 
+// Terraform sometimes gives one object, sometimes a list. Normalize to a list.
 export const asArray = (value) => (value === null || value === undefined ? [] : Array.isArray(value) ? value : [value]);

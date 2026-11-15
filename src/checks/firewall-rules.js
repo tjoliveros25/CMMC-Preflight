@@ -2,6 +2,8 @@
 //   { resource, from, to, protocol, cidrs, unknown }
 import { ofType, isUnknown, asArray, WORLD } from './util.js';
 
+// Three ways to write an inbound rule: inline in the group, aws_security_group_rule,
+// or aws_vpc_security_group_ingress_rule.
 export function inboundRules(resources) {
   const rules = [];
 
@@ -52,8 +54,10 @@ export const hasFirewallResources = (resources) =>
 
 export const fromWorld = (rule) => (rule.cidrs ?? []).some((cidr) => WORLD.has(cidr));
 
+// -1 means all protocols, which also means all ports.
 export const allProtocols = (rule) => rule.protocol === '-1' || rule.protocol === 'all';
 
+// "6" is TCP's protocol number; some plans use that instead of "tcp".
 export const coversPort = (rule, port) =>
   allProtocols(rule) ||
   ((rule.protocol === 'tcp' || rule.protocol === '6') && Number(rule.from) <= port && port <= Number(rule.to));

@@ -1,7 +1,9 @@
 // Check 10: web traffic is encrypted in transit (load balancer listeners).
+// HTTPS or TLS passes. Plain HTTP only passes if it redirects to HTTPS.
 import { finding, ofType, isUnknown, asArray } from './util.js';
 
 const id = 'transit-encryption';
+// Listener protocols that encrypt traffic.
 const ENCRYPTED = new Set(['HTTPS', 'TLS']);
 
 export default {
@@ -18,6 +20,7 @@ export default {
       } else if (ENCRYPTED.has(protocol)) {
         findings.push(finding(id, 'pass', listener, 'encrypted'));
       } else if (protocol === 'HTTP') {
+        // Plain HTTP is OK only if it immediately sends people to HTTPS.
         const redirects = asArray(listener.values.default_action).some(
           (action) => action.type === 'redirect' && asArray(action.redirect)[0]?.protocol === 'HTTPS',
         );

@@ -8,6 +8,3 @@ node_modules/
 *.tfstate.*
 tfplan
 plan.json
-
-# Plans generated for testing
-failing-plan-*.json

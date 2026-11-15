@@ -99,3 +99,7 @@ expect a mixed result rather than a clean 0 or 10. **For the demo use the real e
 2. Register it in `src/checks/index.js`.
 3. Add its wording to `src/content.js` under the same `id`, with a message for every reason.
 4. Add tests for a failing case, a passing case, and an unknown case.
+
+## License
+
+MIT. See [LICENSE](LICENSE). CMMC Preflight is a free readiness aid, not legal or compliance advice, and it is not affiliated with the Department of Defense, NIST, or the Cyber AB.

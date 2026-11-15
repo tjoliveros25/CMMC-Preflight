@@ -6,9 +6,7 @@
   "description": "A free first-pass CMMC readiness check for AWS Terraform plans. Runs entirely in the browser.",
   "scripts": {
     "test": "node --test",
-    "start": "npx --yes serve .",
-    "random-plan": "node tools/make-random-plan.js",
-    "fuzz": "node tools/make-random-plan.js --fuzz 300"
+    "start": "npx --yes serve ."
   },
   "engines": {
     "node": ">=20"

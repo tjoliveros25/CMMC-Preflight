@@ -6,9 +6,7 @@
     python tools/make_random_plan.py --seed 42           the same plan every time
     python tools/make_random_plan.py --summary           say what is in it
 
-Needs nothing but Python 3. There is a JavaScript twin, tools/make-random-plan.js, which
-does the same job and can also run the checks over hundreds of generated plans at once
-(`npm run fuzz`). This one exists so you can generate a plan without installing Node.
+Needs nothing but Python 3: standard library only, nothing to install.
 
 WHAT THIS WRITES
 

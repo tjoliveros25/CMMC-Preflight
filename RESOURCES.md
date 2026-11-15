@@ -1,10 +1,7 @@
-# ReadyCheck — Team Resource Sheet
+# CMMC Preflight — Team Resource Sheet
 
 ## Open decisions (settle these first)
 
-- [ ] **Five checks or ten?** This sheet originally described 5 checks in a single
-      `index.html`. The code in this folder has 10 checks in separate files with tests.
-      Pick one. This sheet now describes the 10-check build.
 - [ ] **Who takes which role.** Four roles below, three people. Someone doubles up.
 - [ ] **Cloudflare Pages or Vercel.** `vercel.json` is written; Cloudflare would need its own
       header file.
@@ -13,7 +10,7 @@
 
 | What | Where |
 | --- | --- |
-| GitHub repository | https://github.com/tjoliveros25/readycheck |
+| GitHub repository | https://github.com/tjoliveros25/CMMC-Preflight |
 | Live site | TBD after first deploy |
 | Submission page | TBD — add the Devpost or event link |
 | Submission deadline | TBD — add date and time |
@@ -22,8 +19,10 @@
 
 | File | What it is | Who uses it |
 | --- | --- | --- |
-| `index.html`, `styles.css` | The site: Overview, Run a check, The 10 checks, Limits & FAQ | Design |
-| `example-plan.json` | Downloadable example, offered on the Run a check page | Demo lead |
+| `index.html`, `styles.css` | The site: Overview, Run a check, The 10 checks, Security, Limits & FAQ | Design |
+| `src/families.js` | The 14 NIST families and their requirement counts, for the coverage grid | Checks engine |
+| `samples/real-insecure-plan.json` | A genuine Terraform export. Fails all 10. The page's download | Demo lead |
+| `samples/real-fixed-plan.json` | The same environment fixed. Passes all 10 | Demo lead |
 | `src/parser.js` | Reads a Terraform plan into a resource list | Checks engine |
 | `src/checks/` | One file per check | Checks engine |
 | `src/content.js` | Every sentence the report prints, plus fix snippets | Design |
@@ -33,8 +32,9 @@
 | `samples/definitions.js` | The two demo environments, defined once for every sample | Checks engine |
 | `samples/build-sample-files.js` | Regenerates the JSON samples and the example file | Checks engine |
 | `fixtures/` | Terraform source behind the two samples | Checks engine |
-| `tests/readycheck.test.js` | 16 unit tests | Everyone |
+| `tests/cmmc-preflight.test.js` | 16 unit tests | Everyone |
 | `vercel.json` | Security headers for hosting | Demo |
+| `dev-server.py` | Local preview with those same headers. Not deployed | Demo |
 | `README.md` | Project write-up for GitHub and judges | Submission |
 | `CONTRIBUTING.md` | Branches and the daily git loop | Everyone |
 | `RESOURCES.md` | This sheet | Team |
@@ -42,8 +42,8 @@
 ## Running it
 
 ```
-npm test     # 16 tests, all should pass
-npm start    # http://localhost:3000
+npm test               # 16 tests, all should pass
+python dev-server.py   # http://localhost:3000, with the real security headers
 ```
 
 Node 20 or newer. No dependencies and no build step. The page must be served, not opened from
@@ -92,12 +92,46 @@ figure covers total compliance and is the one the government cited when pausing 
 - Vercel deploy: https://vercel.com/docs/deployments
 - Cloudflare Pages: https://developers.cloudflare.com/pages/
 
+## Judging criteria
+
+Four criteria, 5 points each, 20 total, weighted equally. The organisers said participants
+should describe what they did for each one, so say each of these out loud in the demo.
+
+| Criterion | What they ask | What we say |
+| --- | --- | --- |
+| Technology (5) | How technically impressive? Was the problem difficult? | A Terraform plan parser that resolves references across modules, 10 independent checks, three-state logic that reports "could not determine" rather than guessing, 16 unit tests, and a Security page that proves the privacy claim live by attempting an outbound request and showing the browser block it. |
+| Design (5) | Thought into the user experience? How well designed? | Five sections, a live demo that runs the real parser step by step on the home page, filter chips and search over findings, keyboard shortcuts, light and dark themes, a hamburger menu on phones, a print and Markdown export, and every finding written in plain English for a non-engineer. |
+| Completion (5) | Does the hack work? Did you achieve what you wanted? | All 10 checks ship and pass tests. Demo it end to end: a plan with problems scores 0 of 10, the fixed plan scores 10 of 10. Scope was set at 10 checks on day one and all 10 are done. |
+| Learning (5) | Did the team stretch themselves? Learn something new? | Each owner names the thing they had not done before: the Terraform JSON format, NIST 800-171 mapping, browser-only file processing, or CSP headers. Prepare one sentence each; this is the criterion teams forget to answer. |
+
+**Learning is the criterion most often left on the table.** It is 5 of 20 points and it is
+about you, not the product. Write your sentence before Monday.
+
 ## Hackathon rules (read before Monday)
 
 - MLH Hackathon Rules: https://github.com/MLH/mlh-hackathon-rules/blob/master/Rules.md
 - MLH Code of Conduct: https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md
-- Max team of 4. Work done during the event. List AI tools used.
+- Max team of 4. Teams are NPower participants only. All members should participate.
+- An idea from before the event is allowed. An idea that has been done before is allowed;
+  judged on quality, not novelty.
+- **All work on the project should be done during the hackathon.** Libraries, frameworks and
+  open-source code are allowed, but writing project code before the event and open-sourcing
+  it so you can use it during the event is explicitly against the rules.
+- Adding features to an existing project is allowed, but judges only consider what was added
+  during the hackathon.
+- Stop when time is up. Small bug fixes during the demo are fine; new features are not.
 - Add a LICENSE file to the repository. MIT is the usual choice.
+- List the AI tools used. See the table above.
+
+### Open question on rule 5
+
+Rule 5 says all work on a project should be done during the hackathon, and rule 10 says
+judges only count what was added during it. Check when the event window officially opened
+against the commit timestamps in the repository. If any of this code predates the start,
+the honest options are to tell the organisers and let them decide what counts, or to treat
+the earlier work as the "existing project" and present only what you build inside the window.
+Ask an organiser rather than guess: rule 13 allows disqualification at their discretion, and
+the git history is public.
 
 ## Plan
 
@@ -129,7 +163,7 @@ the site still works offline from `npm start`, but have the recording ready eith
 
 Say this in the demo and keep it on the last slide:
 
-> ReadyCheck reviews 10 technical settings out of the 110 requirements in NIST SP 800-171
+> CMMC Preflight reviews 10 technical settings out of the 110 requirements in NIST SP 800-171
 > Revision 2. It is not a CMMC assessment, it does not produce an SPRS score, and a pass does
 > not mean a requirement is met. It checks what a Terraform plan says will be built, not what
 > is running.
@@ -140,7 +174,7 @@ Say this in the demo and keep it on the last slide:
 configuration. The rest is policy and people. We scoped to what we could finish and prove."
 
 **"Why not Checkov or Terrascan?"** → "Those exist and have hundreds of rules, but they speak
-to engineers. ReadyCheck speaks to the person filling in the self-assessment, in plain English,
+to engineers. CMMC Preflight speaks to the person filling in the self-assessment, in plain English,
 mapped to the requirement numbers they have to answer for."
 
 **"Would a supplier upload a file with their network layout in it?"** → "They never upload it.

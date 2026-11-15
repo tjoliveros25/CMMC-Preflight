@@ -1,4 +1,4 @@
-# Deliberately insecure. Fails all ten ReadyCheck checks. Never apply this.
+# Deliberately insecure. Fails all ten CMMC Preflight checks. Never apply this.
 #
 # Export it:
 #   terraform init

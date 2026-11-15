@@ -1,4 +1,4 @@
-# ReadyCheck
+# CMMC Preflight
 
 A free first-pass CMMC readiness check for small defense suppliers. Drop in a Terraform plan
 for an AWS environment and get a plain-English report on ten settings tied to NIST SP 800-171
@@ -18,13 +18,15 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 
 | Path | What it holds | Owner |
 | --- | --- | --- |
-| `index.html` | Four sections: Overview, Run a check, The 10 checks, Limits & FAQ | Report |
+| `index.html` | Five sections: Overview, Run a check, The 10 checks, Security, Limits & FAQ | Report |
+| `src/families.js` | The 14 NIST SP 800-171 families and their counts | Checks |
 | `src/parser.js` | Reads the plan JSON into a flat resource list | Parser |
 | `src/checks/` | One file per check, plus shared helpers | Checks |
 | `src/content.js` | All report wording, requirement numbers, fix snippets | Report |
 | `src/report.js`, `src/ui.js`, `styles.css` | Report model, section routing, and styling | Report |
-| `samples/` | Sample plans, all defined in `samples/definitions.js` (synthetic, see below) | Parser |
-| `example-plan.json` | The downloadable example offered on the Run a check page | Parser |
+| `samples/` | Sample plans. The hand-built pair comes from `samples/definitions.js` | Parser |
+| `samples/real-*.json` | Genuine `terraform show -json` exports of `fixtures/`. The page offers the insecure one as a download | Parser |
+| `dev-server.py` | Local preview that applies the real security headers. Not deployed | Demo |
 | `fixtures/` | Terraform source for the insecure and fixed plans | Parser |
 | `tests/` | Unit tests | Everyone |
 | `vercel.json` | Security headers for hosting | Demo |
@@ -34,9 +36,13 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 No install step and no dependencies. You need Node 20 or newer.
 
 ```
-npm test        # run the unit tests
-npm start       # serve the page at http://localhost:3000
+npm test            # run the unit tests
+python dev-server.py   # view the site at http://localhost:3000
 ```
+
+`dev-server.py` is a local preview helper, not part of the site. It reads `vercel.json` and
+sends the same security headers Vercel will, so the Security page behaves locally exactly as
+it will once deployed. `npm start` also works if you prefer Node, but it sends no headers.
 
 The page uses JavaScript modules, so it must be served. Opening `index.html` directly from
 disk will show a blank report.
@@ -63,17 +69,13 @@ security header blocks and which would break the privacy claim.
 
 ## What has and has not been verified
 
-Verified: the unit tests pass, and both built-in samples produce the expected reports
-(0 of 10 and 10 of 10).
+Verified: 18 unit tests pass. Both the hand-built samples and two genuine Terraform exports
+(`samples/real-*.json`, from Terraform 1.16.6) produce the expected reports, 0 of 10 and
+10 of 10. The parser handles real plan output, not just the hand-built kind.
 
 Not yet verified:
 
-- **The samples are synthetic.** `samples/*.js` follow the documented `terraform show -json`
-  format but were not produced by Terraform. Export real plans from `fixtures/` and test with
-  those. Real plans are where the parser is most likely to need changes.
-- **The Terraform fixtures have not been run**, including the placeholder-credentials provider block.
-- **The requirement numbers in `src/content.js` are a proposed mapping.** Confirm each against
-  the NIST SP 800-171 Rev 2 text.
+- **The requirement numbers in `src/content.js` are still a proposed mapping.**
 - **The fix snippets have not been applied.**
 - **The Vercel deployment has not been tried.**
 

@@ -225,6 +225,6 @@ export const STATUS_LABEL = {
 };
 
 export const DISCLAIMER =
-  'ReadyCheck reviewed 10 technical settings out of the 110 requirements in NIST SP 800-171 Revision 2. ' +
+  'CMMC Preflight reviewed 10 technical settings out of the 110 requirements in NIST SP 800-171 Revision 2. ' +
   'It is not a CMMC assessment, does not produce an SPRS score, and a pass here does not mean a requirement is met. ' +
   'It checks what the plan says will be built, not what is running.';

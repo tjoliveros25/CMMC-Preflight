@@ -7,7 +7,10 @@
 // including the references that tie a public access block to its bucket and a flow log to its
 // network.
 //
-// They are still synthetic. The authoritative versions come from exporting fixtures/.
+// These two are synthetic: they follow the documented format but were built by hand.
+// samples/real-insecure-plan.json and samples/real-fixed-plan.json are the genuine article,
+// exported from fixtures/ with `terraform plan` and `terraform show -json`. The page offers
+// the real insecure plan as its download, and the tests check both pairs.
 
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +25,3 @@ for (const [name, resources] of [['weak-plan', weak], ['fixed-plan', fixed]]) {
   writeFileSync(path, `${JSON.stringify(makePlan(resources), null, 2)}\n`);
   console.log(`wrote ${path}`);
 }
-
-// The page offers example-plan.json for download, so keep it in step with the weak sample.
-writeFileSync(join(here, '..', 'example-plan.json'), `${JSON.stringify(makePlan(weak), null, 2)}\n`);
-console.log('wrote example-plan.json');

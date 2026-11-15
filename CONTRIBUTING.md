@@ -1,4 +1,4 @@
-# Working on ReadyCheck together
+# Working on CMMC Preflight together
 
 Three people work on one shared copy of the code. Each person has their own **branch**, not
 their own folder, so there is only ever one version of each file to keep in sync.
@@ -15,8 +15,8 @@ their own folder, so there is only ever one version of each file to keep in sync
 ## First-time setup (once per person)
 
 ```
-git clone https://github.com/OWNER/readycheck.git
-cd readycheck
+git clone https://github.com/OWNER/cmmc-preflight.git
+cd cmmc-preflight
 git switch YOUR-BRANCH        # tristan, mathew, or manuel
 npm test                      # should report 16 passing
 npm start                     # page at http://localhost:3000
@@ -49,7 +49,7 @@ who owns which area, and ask before editing someone else's files.
 | Report wording and page | `src/content.js`, `src/report.js`, `src/ui.js`, `styles.css`, `index.html` |
 | Demo, pitch, hosting | `README.md`, `vercel.json` |
 
-Tests live in `tests/readycheck.test.js`. Everyone adds to it, so pull from `main` before
+Tests live in `tests/cmmc-preflight.test.js`. Everyone adds to it, so pull from `main` before
 editing it to avoid conflicts.
 
 ## Rules

@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ReadyCheck</title>
+  <title>CMMC Preflight</title>
   <meta name="description" content="A free first-pass CMMC readiness check for small defense suppliers. Drop in an AWS Terraform plan and get a plain-English report. Your file is read in your browser and is not uploaded.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip" href="#main-content">Skip to content</a>
+
   <header class="masthead">
     <div class="masthead-inner">
       <a class="brand" href="#overview">
@@ -16,34 +18,93 @@
           <path d="M16 2.5 4.5 7v8.6c0 6.6 4.6 11.6 11.5 13.9 6.9-2.3 11.5-7.3 11.5-13.9V7L16 2.5Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"></path>
           <path d="m10.5 16.2 4 4 7.2-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>
-        <span>
-          <strong>ReadyCheck</strong>
+        <span class="brand-text">
+          <strong>CMMC Preflight</strong>
           <small>CMMC readiness for small defense suppliers</small>
         </span>
       </a>
+
+      <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="tabs" aria-label="Menu">
+        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="nav-toggle-text">Menu</span>
+      </button>
+
       <nav class="tabs" id="tabs" aria-label="Sections">
-        <a href="#overview" data-view="overview">Overview</a>
-        <a href="#check" data-view="check">Run a check</a>
-        <a href="#checks" data-view="checks">The 10 checks</a>
-        <a href="#limits" data-view="limits">Limits &amp; FAQ</a>
+        <a href="#overview" data-view="overview"><span class="key" aria-hidden="true">1</span>Overview</a>
+        <a href="#check" data-view="check"><span class="key" aria-hidden="true">2</span>Run a check</a>
+        <a href="#checks" data-view="checks"><span class="key" aria-hidden="true">3</span>The 10 checks</a>
+        <a href="#security" data-view="security"><span class="key" aria-hidden="true">4</span>Security</a>
+        <a href="#limits" data-view="limits"><span class="key" aria-hidden="true">5</span>Limits &amp; FAQ</a>
       </nav>
+
+      <div class="masthead-tools">
+        <button type="button" id="theme-toggle" class="icon-button" aria-label="Switch colour theme" title="Theme: follows your system">
+          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-sun"><circle cx="10" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.7"></circle><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4 4l1.4 1.4M14.6 14.6 16 16M16 4l-1.4 1.4M5.4 14.6 4 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
+          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-moon"><path d="M16 11.7A6.5 6.5 0 1 1 8.3 4a5.2 5.2 0 0 0 7.7 7.7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg>
+          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-auto"><rect x="2.5" y="4" width="15" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"></rect><path d="M7 17h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
+        </button>
+        <button type="button" id="help-toggle" class="icon-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.4 7.3a2.7 2.7 0 1 1 3.4 3.1c-.6.2-1 .8-1 1.5v.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="9.8" cy="15.3" r="1" fill="currentColor"></circle></svg>
+        </button>
+      </div>
     </div>
   </header>
 
+  <div id="main-content"></div>
+
   <!-- ============================ OVERVIEW ============================ -->
   <main id="view-overview" class="view page">
-    <section class="hero">
-      <p class="eyebrow">Free, and nothing leaves your browser</p>
-      <h1>Find the cloud settings that will fail your CMMC self-assessment, before an assessor does.</h1>
-      <p class="lede">
-        Drop in a Terraform plan for your AWS setup. ReadyCheck reads it in your browser and returns a
-        plain-English report on 10 settings tied to NIST SP 800-171, with the fix for each one.
-      </p>
-      <div class="hero-actions">
-        <a class="button button-primary button-large" href="#check">Run a check</a>
-        <a class="button button-large" href="#checks">See what it checks</a>
+    <section class="hero-grid">
+      <div class="hero">
+        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span>Free, and nothing leaves your browser</p>
+        <h1>Find the cloud settings that will fail your CMMC self-assessment, before an assessor does.</h1>
+        <p class="lede">
+          Drop in a Terraform plan for your AWS setup. CMMC Preflight reads it in your browser and returns a
+          plain-English report on 10 settings tied to NIST SP 800-171, with the fix for each one.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary button-large" href="#check">Run a check</a>
+          <a class="button button-large" href="#checks">See what it checks</a>
+        </div>
+        <p class="hero-note">No account, no upload, no cost. It is a readiness check, not a certification.</p>
       </div>
-      <p class="hero-note">No account, no upload, no cost. It is a readiness check, not a certification.</p>
+
+      <aside class="preview" aria-labelledby="preview-heading">
+        <div class="preview-head">
+          <h2 id="preview-heading">Live demo <span class="live-dot" aria-hidden="true"></span></h2>
+          <div class="switch" role="group" aria-label="Which plan to run">
+            <button type="button" class="switch-opt is-on" data-preview="weak">Before fixes</button>
+            <button type="button" class="switch-opt" data-preview="fixed">After fixes</button>
+          </div>
+        </div>
+
+        <ol class="run-steps" id="run-steps" aria-live="polite">
+          <li data-step="read"><span class="tick" aria-hidden="true"></span><span class="run-label">Read plan.json in this browser</span><span class="run-value"></span></li>
+          <li data-step="parse"><span class="tick" aria-hidden="true"></span><span class="run-label">Parse resources</span><span class="run-value"></span></li>
+          <li data-step="run"><span class="tick" aria-hidden="true"></span><span class="run-label">Run 10 checks</span><span class="run-value"></span></li>
+          <li data-step="net"><span class="tick" aria-hidden="true"></span><span class="run-label">Data sent to a server</span><span class="run-value"></span></li>
+        </ol>
+
+        <div class="preview-body">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 120 120" role="img" aria-labelledby="preview-ring-label">
+              <title id="preview-ring-label">Checks passed</title>
+              <circle class="ring-track" cx="60" cy="60" r="52" fill="none" stroke-width="12"></circle>
+              <circle class="ring-value" cx="60" cy="60" r="52" fill="none" stroke-width="12" stroke-linecap="round" id="preview-arc"></circle>
+            </svg>
+            <div class="ring-centre">
+              <span class="ring-num" id="preview-num">0</span>
+              <span class="ring-of">of 10</span>
+            </div>
+          </div>
+          <ul class="chips" id="preview-chips"></ul>
+        </div>
+
+        <div class="preview-foot">
+          <button type="button" class="button button-small" id="replay">Run it again</button>
+          <a class="button button-small" href="#check">Open the full report</a>
+        </div>
+      </aside>
     </section>
 
     <section class="band">
@@ -54,15 +115,15 @@
       </p>
       <div class="stats">
         <div class="stat">
-          <span class="stat-num">$593,800</span>
+          <span class="stat-num" data-count-to="593800" data-prefix="$">$593,800</span>
           <span class="stat-label">SBA's estimate of total compliance cost per certification for a small firm</span>
         </div>
         <div class="stat">
-          <span class="stat-num">120,000+</span>
+          <span class="stat-num" data-count-to="120000" data-suffix="+">120,000+</span>
           <span class="stat-label">Small businesses in the defense industrial base facing the requirement</span>
         </div>
         <div class="stat">
-          <span class="stat-num">~100</span>
+          <span class="stat-num" data-count-to="100" data-prefix="~">~100</span>
           <span class="stat-label">Approved assessors available to serve all of them</span>
         </div>
       </div>
@@ -99,7 +160,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           <h3>Read the report</h3>
           <p>
             Every finding names the resource, says why it matters in one sentence, cites the NIST requirement,
-            and gives you Terraform you can paste. Print it or save it as a PDF for your file.
+            and gives you Terraform you can paste. Copy it, print it, or save it as a PDF for your file.
           </p>
         </li>
       </ol>
@@ -153,7 +214,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
       </div>
       <p class="fineprint">
         Free scanners for Terraform already exist and carry hundreds of rules. They are written for engineers.
-        ReadyCheck is written for the person who has to fill in the self-assessment.
+        CMMC Preflight is written for the person who has to fill in the self-assessment.
       </p>
     </section>
 
@@ -174,6 +235,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
       <section class="panel intake" aria-labelledby="intake-heading">
         <h2 id="intake-heading">Check a plan</h2>
         <label class="drop" id="drop-zone" for="plan-file">
+          <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
           <strong>Drop plan.json here</strong>
           <span>or choose a file</span>
           <input type="file" id="plan-file" accept=".json,application/json">
@@ -195,7 +257,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
             <button type="button" id="sample-fixed" class="button">Sample after fixes</button>
           </div>
           <p class="download-line">
-            <a href="example-plan.json" download>Download the example plan</a> to try the drag-and-drop yourself.
+            <a href="samples/real-insecure-plan.json" download>Download a real exported plan</a> to try the drag-and-drop yourself.
           </p>
         </div>
       </section>
@@ -205,11 +267,28 @@ terraform show -json tfplan &gt; plan.json</code></pre>
 
     <section class="results" aria-labelledby="results-heading">
       <div id="notice" role="status"></div>
+
       <div class="results-head">
-        <h2 id="results-heading">Findings</h2>
-        <p id="results-sub" class="results-sub"></p>
+        <div>
+          <h2 id="results-heading">Findings</h2>
+          <p id="results-sub" class="results-sub"></p>
+        </div>
       </div>
+
+      <div class="toolbar" id="toolbar">
+        <div class="filters" id="filters" role="group" aria-label="Filter findings by result"></div>
+        <div class="toolbar-right">
+          <div class="search">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"></circle><path d="m13.2 13.2 3.3 3.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
+            <input type="search" id="search" placeholder="Search findings or resources" aria-label="Search findings">
+          </div>
+          <button type="button" class="button button-small" id="expand-all">Expand all</button>
+          <button type="button" class="button button-small" id="collapse-all">Collapse all</button>
+        </div>
+      </div>
+
       <ol id="findings" class="findings"></ol>
+      <p class="empty" id="empty" hidden>No findings match that filter.</p>
       <p class="disclaimer" id="disclaimer"></p>
     </section>
   </main>
@@ -224,6 +303,38 @@ terraform show -json tfplan &gt; plan.json</code></pre>
       </p>
     </section>
     <section class="band">
+      <h2>Where these 10 sit in the standard</h2>
+      <p class="band-lede">
+        NIST SP 800-171 Revision 2 has 110 requirements in 14 families. Each square below is one
+        requirement. The filled squares are the ones these checks look at.
+      </p>
+      <div class="coverage" id="coverage" role="img" aria-label="10 of 110 requirements covered"></div>
+      <p class="coverage-key">
+        <span class="k on" aria-hidden="true"></span> Covered by a check
+        <span class="k off" aria-hidden="true"></span> Not covered
+        <span class="coverage-count" id="coverage-count"></span>
+      </p>
+      <div class="table-wrap">
+        <table class="families-table" id="families-table">
+          <thead>
+            <tr>
+              <th scope="col">Family</th><th scope="col">Code</th>
+              <th scope="col">Requirements</th><th scope="col">Checked here</th>
+              <th scope="col">Can a Terraform plan show it?</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="fineprint">
+        A plan can carry part of the answer for the families marked "partly". It can never answer
+        training, incident response, maintenance, media handling, personnel screening, physical
+        protection, risk assessment or security assessment, which are about people and paperwork.
+      </p>
+    </section>
+
+    <section class="band">
+      <h2>The checks themselves</h2>
       <div class="table-wrap">
         <table class="checks-table" id="checks-table">
           <thead>
@@ -232,12 +343,115 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           <tbody></tbody>
         </table>
       </div>
-      <p class="fineprint">
-        NIST SP 800-171 Revision 2 has 110 requirements across 14 families. A Terraform plan can only show
-        evidence for the technical ones. Everything about people, paperwork and physical space has to be
-        answered another way.
-      </p>
       <p><a class="button button-primary" href="#check">Run these against a plan</a></p>
+    </section>
+  </main>
+
+
+  <!-- ============================ SECURITY ============================ -->
+  <main id="view-security" class="view page" hidden>
+    <section class="hero hero-tight">
+      <h1>How this site is secure</h1>
+      <p class="lede">
+        A defense supplier's Terraform plan is a map of their network, and it can contain secrets.
+        That is exactly the file we ask for, so the claim has to be checkable rather than promised.
+        Everything below runs live in the browser you are reading this in.
+      </p>
+    </section>
+
+    <section class="band">
+      <h2>Check it yourself, right now</h2>
+      <div class="proof-grid">
+        <div class="proof" id="proof-net">
+          <h3>Requests to other servers</h3>
+          <p class="proof-value" id="net-count">0</p>
+          <p class="proof-note" id="net-note">Counted live from this page's own performance log.</p>
+        </div>
+        <div class="proof" id="proof-test">
+          <h3>Try to make it leak</h3>
+          <p class="proof-note">
+            This button asks the page to send a string to an outside server, the way a tracker would.
+            Watch the browser refuse.
+          </p>
+          <button type="button" class="button button-primary" id="leak-test">Attempt to send data</button>
+          <p class="proof-result" id="leak-result" role="status"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>What the page is allowed to load</h2>
+      <p class="band-lede">
+        Everything this page has fetched since it opened, read from the browser's own performance log.
+        All of it is this site's own code. There is no analytics, no font service, no CDN.
+      </p>
+      <div class="table-wrap">
+        <table class="checks-table" id="resources-table">
+          <thead><tr><th scope="col">File</th><th scope="col">Origin</th><th scope="col">Size</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>Why it cannot send your plan anywhere</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>There is no server</h3>
+          <p>The whole tool is static files. No backend, no database, no account, nothing to receive a file even if the page tried to send one.</p>
+        </div>
+        <div class="card">
+          <h3>The file is read locally</h3>
+          <p>Your plan is handed to the page by the browser's own file picker and read with the File API. It stays in memory on your machine and is dropped when you close the tab.</p>
+        </div>
+        <div class="card">
+          <h3>A policy blocks the rest</h3>
+          <p>The site is served with a Content Security Policy that sets <code>connect-src 'none'</code>, so the browser refuses any outbound request the page attempts.</p>
+        </div>
+        <div class="card">
+          <h3>Nothing is stored</h3>
+          <p>No cookies, and the only thing kept in browser storage is which colour theme you chose.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>The policy, as served</h2>
+      <p class="band-lede">From <code>vercel.json</code> in the repository, applied to every response.</p>
+      <pre><code>Content-Security-Policy:
+  default-src 'none';
+  script-src 'self';
+  style-src 'self';
+  img-src 'self' data:;
+  connect-src 'none';
+  base-uri 'none';
+  form-action 'none';
+  frame-ancestors 'none'
+
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer</code></pre>
+      <p class="fineprint">
+        <code>connect-src 'none'</code> is the line that matters: it forbids fetch, XMLHttpRequest and
+        WebSocket entirely. <code>form-action 'none'</code> stops a form posting anywhere, and
+        <code>frame-ancestors 'none'</code> stops another site embedding this one to read what you do.
+        Check the headers yourself in your browser's network tab, or with
+        <code>curl -I</code> against the deployed URL.
+      </p>
+    </section>
+
+    <section class="band">
+      <h2>What this does not protect against</h2>
+      <ul class="crosses">
+        <li>A compromised browser or a malicious extension, which can read any page you open</li>
+        <li>A tampered copy of this site hosted by someone else. Check the URL and the source</li>
+        <li>Your own copy of the plan file, which still sits on your disk and may contain secrets</li>
+        <li>Anything you paste elsewhere afterwards, including into other AI tools</li>
+      </ul>
+      <p class="fineprint">
+        The plan file is worth treating carefully in its own right. Terraform can write variable values
+        into it, so keep it out of version control. The repository's <code>.gitignore</code> already
+        blocks <code>plan.json</code> and <code>tfplan</code> for that reason.
+      </p>
     </section>
   </main>
 
@@ -268,7 +482,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           <summary>Why not use Checkov, Terrascan or KICS?</summary>
           <p>
             Use them, they are good. They carry hundreds of rules and they are written for engineers, producing
-            rule IDs and severity levels. ReadyCheck answers a different question: what do I write in the
+            rule IDs and severity levels. CMMC Preflight answers a different question: what do I write in the
             self-assessment, and which requirement does this affect? That is why every finding here is one plain
             sentence with a requirement number and a fix.
           </p>
@@ -320,10 +534,35 @@ terraform show -json tfplan &gt; plan.json</code></pre>
 
   <footer class="footer">
     <p>
-      ReadyCheck is a free, open readiness aid. It is not affiliated with the Department of Defense,
+      CMMC Preflight is a free, open readiness aid. It is not affiliated with the Department of Defense,
       the Department of War, NIST, or the Cyber AB.
     </p>
   </footer>
+
+  <!-- Drag overlay, shortcut help, and toasts -->
+  <div class="dropveil" id="dropveil" hidden><div class="dropveil-card">Drop the plan to check it</div></div>
+
+  <div class="sheet" id="help-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="sheet-card">
+      <div class="sheet-head">
+        <h2 id="help-title">Keyboard shortcuts</h2>
+        <button type="button" class="icon-button" id="help-close" aria-label="Close">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        </button>
+      </div>
+      <dl class="shortcuts">
+        <dt><kbd>1</kbd>&hellip;<kbd>5</kbd></dt><dd>Jump to a section</dd>
+        <dt><kbd>/</kbd></dt><dd>Search the findings</dd>
+        <dt><kbd>E</kbd></dt><dd>Expand every finding</dd>
+        <dt><kbd>C</kbd></dt><dd>Collapse every finding</dd>
+        <dt><kbd>T</kbd></dt><dd>Change the colour theme</dd>
+        <dt><kbd>?</kbd></dt><dd>Open this list</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Close this list, or clear the search</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module" src="src/ui.js"></script>
 </body>

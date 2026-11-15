@@ -1,4 +1,4 @@
-# The insecure fixture with every finding fixed. Should pass all ten ReadyCheck checks.
+# The insecure fixture with every finding fixed. Should pass all ten CMMC Preflight checks.
 #
 # Export it:
 #   terraform init

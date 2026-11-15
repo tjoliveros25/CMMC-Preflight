@@ -58,7 +58,7 @@ export function parsePlan(plan) {
   if (awsCount === 0) {
     throw new PlanError(
       'no_aws',
-      'This plan contains no AWS resources. ReadyCheck currently checks AWS only.',
+      'This plan contains no AWS resources. CMMC Preflight currently checks AWS only.',
     );
   }
 

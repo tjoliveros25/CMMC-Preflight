@@ -251,13 +251,10 @@ terraform show -json tfplan &gt; plan.json</code></pre>
 terraform show -json tfplan &gt; plan.json</code></pre>
         </details>
         <div class="samples">
-          <p>No plan to hand? Try a sample.</p>
-          <div class="sample-buttons">
-            <button type="button" id="sample-insecure" class="button">Sample with problems</button>
-            <button type="button" id="sample-fixed" class="button">Sample after fixes</button>
-          </div>
+          <p>No plan to hand? Load an example.</p>
+          <div class="sample-buttons" id="example-buttons"></div>
           <p class="download-line">
-            <a href="samples/real-insecure-plan.json" download>Download a real exported plan</a> to try the drag-and-drop yourself.
+            <a href="samples/real-insecure-plan.json" download>Download the real exported plan</a> to try the drag-and-drop yourself.
           </p>
         </div>
       </section>
@@ -286,6 +283,19 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           <button type="button" class="button button-small" id="collapse-all">Collapse all</button>
         </div>
       </div>
+
+      <section class="start" id="start">
+        <h3>Nothing checked yet</h3>
+        <p>
+          Drop a <code>plan.json</code> anywhere on this page, or pick one of these to see what a
+          report looks like. Nothing runs until you choose.
+        </p>
+        <div class="start-grid" id="start-grid"></div>
+        <p class="start-foot">
+          Whatever you load is read in this browser and is not uploaded.
+          <a href="#security">How that is enforced</a>.
+        </p>
+      </section>
 
       <ol id="findings" class="findings"></ol>
       <p class="empty" id="empty" hidden>No findings match that filter.</p>

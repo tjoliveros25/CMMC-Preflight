@@ -369,6 +369,82 @@ async function leakTest() {
 
 $('leak-test').addEventListener('click', leakTest);
 
+// ---------- Examples ----------
+
+// The two real exports are large, so they load only when someone asks for one. A dynamic
+// import works where fetch does not: the policy sets connect-src 'none'.
+const EXAMPLES = [
+  {
+    id: 'sample-insecure',
+    label: 'Sample with problems',
+    note: 'Hand-built. Fails all 10.',
+    tone: 'fail',
+    load: () => insecurePlan,
+  },
+  {
+    id: 'sample-fixed',
+    label: 'Sample after fixes',
+    note: 'The same setup, corrected.',
+    tone: 'pass',
+    load: () => fixedPlan,
+  },
+  {
+    id: 'real-insecure',
+    label: 'Real export, before fixes',
+    note: 'Straight out of Terraform 1.16.6.',
+    tone: 'fail',
+    load: () => import('../samples/real-insecure-plan.js').then((m) => m.default),
+  },
+  {
+    id: 'real-fixed',
+    label: 'Real export, after fixes',
+    note: 'The same, with every finding fixed.',
+    tone: 'pass',
+    load: () => import('../samples/real-fixed-plan.js').then((m) => m.default),
+  },
+];
+
+async function loadExample(example, button) {
+  const previous = button.textContent;
+  button.disabled = true;
+  button.dataset.busy = 'true';
+  try {
+    const plan = await example.load();
+    if (run(() => parsePlan(plan), example.label, true)) {
+      toast(`${example.label}: ${report.passed} of ${report.applicable} passed`);
+    }
+  } catch {
+    showNotice('error', 'That example could not be loaded.', 'Try another, or drop your own plan.json.');
+  } finally {
+    button.disabled = false;
+    delete button.dataset.busy;
+    button.textContent = previous;
+  }
+}
+
+function renderExamples() {
+  // Compact buttons in the rail, and fuller cards on the idle screen.
+  $('example-buttons').replaceChildren(
+    ...EXAMPLES.map((example) => {
+      const button = h('button', { type: 'button', class: 'button', text: example.label });
+      button.addEventListener('click', () => loadExample(example, button));
+      return button;
+    }),
+  );
+
+  $('start-grid').replaceChildren(
+    ...EXAMPLES.map((example) => {
+      const card = h('button', { type: 'button', class: 'start-card', 'data-tone': example.tone },
+        h('span', { class: 'start-card-label', text: example.label }),
+        h('span', { class: 'start-card-note', text: example.note }),
+        h('span', { class: 'start-card-go', text: 'Check it' }),
+      );
+      card.addEventListener('click', () => loadExample(example, card));
+      return card;
+    }),
+  );
+}
+
 // ---------- Report state ----------
 
 let report = null;
@@ -636,6 +712,24 @@ function renderReport() {
   applyFilter();
 }
 
+// Nothing has been checked yet: the page waits rather than running something on its own.
+function showIdle() {
+  report = null;
+  source = null;
+  $('start').hidden = false;
+  $('findings').replaceChildren();
+  $('empty').hidden = true;
+  $('toolbar').hidden = true;
+  $('disclaimer').hidden = true;
+  $('notice').replaceChildren();
+  $('results-sub').textContent = 'Pick an example or drop a plan to begin.';
+  $('summary').replaceChildren(
+    h('h2', { id: 'summary-heading', text: 'Result' }),
+    h('p', { class: 'rail-idle', text: 'No plan checked yet.' }),
+    h('p', { class: 'rail-idle-note', text: 'Your result, the 10 findings and the fixes appear here.' }),
+  );
+}
+
 function showNotice(kind, title, text) {
   $('notice').replaceChildren(
     h('div', { class: `notice notice-${kind}` }, h('strong', { text: title }), h('span', { text: text })),
@@ -650,6 +744,9 @@ function run(parse, label, sample) {
     report = buildReport(resources);
     source = { label, meta };
     activeFilter = 'all';
+    $('start').hidden = true;
+    $('toolbar').hidden = false;
+    $('disclaimer').hidden = false;
     renderReport();
     if (sample) showNotice('sample', 'This is a sample plan.', 'Drop your own plan.json on the left to check it.');
     else $('notice').replaceChildren();
@@ -702,9 +799,6 @@ window.addEventListener('drop', (event) => {
   const file = event.dataTransfer?.files?.[0];
   if (file) loadFile(file);
 });
-
-$('sample-insecure').addEventListener('click', () => run(() => parsePlan(insecurePlan), 'Sample with problems', true));
-$('sample-fixed').addEventListener('click', () => run(() => parsePlan(fixedPlan), 'Sample after fixes', true));
 
 // ---------- Toolbar ----------
 
@@ -787,7 +881,8 @@ renderChecksTable();
 renderCoverage();
 $('statement').textContent = DISCLAIMER;
 // The check section opens in a working state, showing the sample with problems.
-run(() => parsePlan(insecurePlan), 'Sample with problems', true);
+renderExamples();
+showIdle();
 routeFromHash();
 countUpStats();
 refreshSecurity();

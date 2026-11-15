@@ -25,7 +25,8 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 | `src/content.js` | All report wording, requirement numbers, fix snippets | Report |
 | `src/report.js`, `src/ui.js`, `styles.css` | Report model, section routing, and styling | Report |
 | `samples/` | Sample plans. The hand-built pair comes from `samples/definitions.js` | Parser |
-| `samples/real-*.json` | Genuine `terraform show -json` exports of `fixtures/`. The page offers the insecure one as a download | Parser |
+| `samples/real-*.json` | Genuine `terraform show -json` exports of `fixtures/`. Offered as a download | Parser |
+| `samples/real-*.js` | The same two, wrapped as modules so the page can load one on click. Generated | Parser |
 | `dev-server.py` | Local preview that applies the real security headers. Not deployed | Demo |
 | `fixtures/` | Terraform source for the insecure and fixed plans | Parser |
 | `tests/` | Unit tests | Everyone |

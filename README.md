@@ -49,26 +49,6 @@ it will once deployed. `npm start` also works if you prefer Node, but it sends n
 The page uses JavaScript modules, so it must be served. Opening `index.html` directly from
 disk will show a blank report.
 
-## Deploy to Vercel
-
-1. Push this folder to a GitHub repository. The repository already has a commit and the
-   branches `main`, `tristan`, `mathew` and `manuel`; run `push-to-github.ps1` on Windows or
-   `push-to-github.sh` on Mac, Linux or Git Bash.
-2. In Vercel, choose Add New, then Project, and import the repository.
-3. Framework preset: **Other**. Leave the build command and output directory empty.
-4. Deploy.
-
-There is nothing to build: Vercel serves the files as they are. Each pull request gets its own
-preview link, and merging to the main branch updates the live site.
-
-After the first deploy, check two things on the live link:
-
-- Open the browser's network tab, load a plan, and confirm no requests are sent.
-- Confirm the `Content-Security-Policy` header from `vercel.json` appears on the page response.
-
-Keep Vercel Web Analytics and Speed Insights **off**. Both add outbound requests, which the
-security header blocks and which would break the privacy claim.
-
 ## What has and has not been verified
 
 Verified: 18 unit tests pass. Both the hand-built samples and two genuine Terraform exports

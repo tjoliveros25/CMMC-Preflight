@@ -14,6 +14,7 @@ export class PlanError extends Error {
   }
 }
 
+// Drops count/for_each indexes, so aws_s3_bucket.logs[0] matches aws_s3_bucket.logs in the config.
 export const stripIndex = (address) => address.replace(/\[[^\]]*\]/g, '');
 
 export function parsePlanText(text) {
@@ -76,11 +77,15 @@ export function parsePlan(plan) {
   };
 }
 
+
+// Split "module.net.aws_vpc.main" into the module part ("module.net.") and the resource part,
+// so we can find the same resource in the config section.
+
 function collectResources(module, out, unknownByAddress, configByAddress) {
   if (!module) return;
   for (const r of module.resources ?? []) {
-    if (r.mode && r.mode !== 'managed') continue; // skip data sources
-    const local = `${r.type}.${r.name}`;
+    if (r.mode && r.mode !== 'managed') continue; // skip data source
+    const local = `${r.type}.${r.name}`;    
     const cut = r.address.lastIndexOf(local);
     const modulePrefix = cut > 0 ? r.address.slice(0, cut) : '';
     const configKey = stripIndex(modulePrefix) + local;

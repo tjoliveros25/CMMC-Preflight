@@ -30,6 +30,7 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 | `dev-server.py` | Local preview that applies the real security headers. Not deployed | Demo |
 | `fixtures/` | Terraform source for the insecure and fixed plans | Parser |
 | `tests/` | Unit tests | Everyone |
+| `tools/make-random-plan.js` | Generates random plans for testing the parser | Parser |
 | `vercel.json` | Security headers for hosting | Demo |
 
 ## Run it locally
@@ -37,7 +38,8 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 No install step and no dependencies. You need Node 20 or newer.
 
 ```
-npm test            # run the unit tests
+npm test               # run the unit tests
+npm run fuzz           # 300 random plans through the checks, looking for crashes
 python dev-server.py   # view the site at http://localhost:3000
 ```
 
@@ -79,6 +81,36 @@ Not yet verified:
 - **The requirement numbers in `src/content.js` are still a proposed mapping.**
 - **The fix snippets have not been applied.**
 - **The Vercel deployment has not been tried.**
+
+## A note on what a plan file is
+
+`terraform plan -out=tfplan` does **not** write JSON. That file is binary and opaque, so
+`cat tfplan | jq` gets you nothing. The JSON this tool reads comes from a second command:
+
+```
+terraform show -json tfplan > plan.json
+```
+
+which emits the documented plan representation, the format carrying a `format_version` key.
+That representation is a supported integration point; the binary file is not. Plan files can
+also contain sensitive values, which is why `.gitignore` blocks `tfplan` and `plan.json`, and
+why this tool reads them in the browser rather than uploading them.
+
+## Generating test plans
+
+`tools/make-random-plan.js` builds random but structurally valid plan representations, to
+test the parser against shapes nobody wrote by hand.
+
+```
+node tools/make-random-plan.js --seed 42 --check   # one plan, and what the checks make of it
+node tools/make-random-plan.js --out plan.json     # write one to drop on the page
+npm run fuzz                                       # 300 plans, looking for crashes
+```
+
+Runs are seeded, so `--seed 42` reproduces an exact plan, and a crash during a fuzz run
+writes the offending plan to `failing-plan-N.json`. It covers the fields the checks read,
+not the whole format, so it complements the real exports in `samples/` rather than replacing
+them.
 
 ## Adding a check
 

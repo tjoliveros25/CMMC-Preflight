@@ -5,9 +5,8 @@
 #   terraform plan -out=tfplan
 #   terraform show -json tfplan > plan.json
 #
-# The provider block uses placeholder keys so that `plan` should not need a real AWS
-# account. This has not been run; if `plan` asks for credentials, that is the first
-# thing to fix.
+# The provider block uses placeholder keys, so `plan` does not need a real AWS account.
+# Planned with Terraform 1.16.6; the export is samples/real-insecure-plan.json.
 
 terraform {
   required_providers {

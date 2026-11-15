@@ -5,7 +5,8 @@
 #   terraform plan -out=tfplan
 #   terraform show -json tfplan > plan.json
 #
-# Not yet run. See the note in fixtures/insecure/main.tf about the provider block.
+# Planned with Terraform 1.16.6 using the placeholder keys below; the export is
+# samples/real-fixed-plan.json. Never apply.
 
 terraform {
   required_providers {

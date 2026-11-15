@@ -12,13 +12,17 @@ their own folder, so there is only ever one version of each file to keep in sync
 | `mathew` | Mathew | Mathew's work in progress |
 | `manuel` | Manuel | Manuel's work in progress |
 
+Each personal branch only exists on GitHub once its owner has pushed it, so the first-time
+setup below creates it. Until then GitHub shows just `main`.
+
 ## First-time setup (once per person)
 
 ```
-git clone https://github.com/OWNER/cmmc-preflight.git
+git clone https://github.com/tjoliveros25/cmmc-preflight.git
 cd cmmc-preflight
-git switch YOUR-BRANCH        # tristan, mathew, or manuel
-npm test                      # should report 16 passing
+git switch -c YOUR-BRANCH     # creates it: tristan, mathew, or manuel
+git push -u origin YOUR-BRANCH  # puts your branch on GitHub
+npm test                      # should report 19 passing
 npm start                     # page at http://localhost:3000
 ```
 

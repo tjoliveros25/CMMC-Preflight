@@ -1,4 +1,4 @@
-// Page behaviour: theme, section routing, the live preview, and the interactive report.
+// Page behaviour: section routing, the live preview, and the interactive report.
 // Nothing in this file (or anywhere in CMMC Preflight) sends data over the network.
 import { parsePlan, parsePlanText, PlanError } from './parser.js';
 import { buildReport } from './report.js';
@@ -32,59 +32,20 @@ function h(tag, props = {}, ...children) {
 const two = (n) => String(n).padStart(2, '0');
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// localStorage is per-browser and can throw; it only ever holds the theme choice here.
-const store = {
-  get(key) {
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  },
-  set(key, value) {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      /* private browsing, or storage is full */
-    }
-  },
-};
-
 // ---------- Toasts ----------
 
+// One notice at a time: a new one replaces whatever is showing, so they never stack
+// over the report.
+let toastTimers = [];
 function toast(message) {
-  const el = h('div', { class: 'toast', text: message });
-  $('toasts').append(el);
-  setTimeout(() => el.classList.add('is-out'), 2200);
-  setTimeout(() => el.remove(), 2600);
+  toastTimers.forEach(clearTimeout);
+  const el = h('div', { class: 'toast', role: 'status', text: message });
+  $('toasts').replaceChildren(el);
+  toastTimers = [
+    setTimeout(() => el.classList.add('is-out'), 2200),
+    setTimeout(() => el.remove(), 2600),
+  ];
 }
-
-// ---------- Theme ----------
-
-const THEMES = ['auto', 'light', 'dark'];
-const THEME_TITLE = {
-  auto: 'Theme: follows your system',
-  light: 'Theme: light',
-  dark: 'Theme: dark',
-};
-let theme = THEMES.includes(store.get('theme')) ? store.get('theme') : 'auto';
-
-function applyTheme() {
-  const root = document.documentElement;
-  if (theme === 'auto') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', theme);
-  root.setAttribute('data-theme-choice', theme);
-  $('theme-toggle').title = THEME_TITLE[theme];
-}
-
-function cycleTheme() {
-  theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
-  store.set('theme', theme);
-  applyTheme();
-  toast(THEME_TITLE[theme]);
-}
-
-$('theme-toggle').addEventListener('click', cycleTheme);
 
 // ---------- Sections ----------
 
@@ -922,12 +883,10 @@ document.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   if (key === 'e') setAllOpen(true);
   else if (key === 'c') setAllOpen(false);
-  else if (key === 't') cycleTheme();
 });
 
 // ---------- Start ----------
 
-applyTheme();
 renderChecksTable();
 renderCoverage();
 $('statement').textContent = DISCLAIMER;

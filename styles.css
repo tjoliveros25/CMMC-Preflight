@@ -33,7 +33,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root {
     --paper: #0e151b;
     --surface: #162029;
     --sunken: #111a22;
@@ -55,29 +55,6 @@
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -16px rgba(0, 0, 0, 0.8);
     color-scheme: dark;
   }
-}
-
-:root[data-theme="dark"] {
-  --paper: #0e151b;
-  --surface: #162029;
-  --sunken: #111a22;
-  --ink: #e7eef3;
-  --muted: #9cabb7;
-  --line: #2b3944;
-  --line-soft: #223039;
-  --accent: #7cb9e0;
-  --accent-ink: #0b1319;
-  --accent-soft: #1b2b38;
-  --fail: #f28b82;
-  --fail-bg: #3a1c1a;
-  --unknown: #e7b84e;
-  --unknown-bg: #33280f;
-  --pass: #6bd39c;
-  --pass-bg: #14301f;
-  --na: #94a2ad;
-  --na-bg: #212c35;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -16px rgba(0, 0, 0, 0.8);
-  color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -143,9 +120,10 @@ a { color: inherit; }
 }
 
 .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; margin-right: auto; }
-.mark { width: 32px; height: 32px; color: var(--accent); flex: none; }
-.brand-text strong { display: block; font-size: 1.22rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15; }
-.brand-text small { display: block; color: var(--muted); font-size: 0.8rem; }
+.brand { flex-direction: column; align-items: flex-start; gap: 4px; }
+.logo, .logo img { display: block; }
+.logo img { height: 34px; width: auto; }
+.brand-tagline { color: var(--muted); font-size: 0.78rem; line-height: 1.2; }
 
 .tabs { display: flex; flex-wrap: wrap; gap: 3px; }
 .tabs a {
@@ -194,13 +172,6 @@ a { color: inherit; }
 .icon-button:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
 .icon-button:active { transform: translateY(0); background: var(--sunken); }
 .icon-button svg { width: 18px; height: 18px; }
-
-/* The theme button shows one icon for the current choice. */
-.icon-sun, .icon-moon, .icon-auto { display: none; }
-:root:not([data-theme-choice]) .icon-auto,
-:root[data-theme-choice="auto"] .icon-auto,
-:root[data-theme-choice="light"] .icon-sun,
-:root[data-theme-choice="dark"] .icon-moon { display: block; }
 
 /* ---------- Content pages ---------- */
 
@@ -1079,8 +1050,14 @@ li[data-state="done"] .tick::after {
 .proof[data-state="bad"] .proof-result { color: var(--fail); }
 
 @media (max-width: 860px) {
-  .nav-toggle { display: inline-flex; margin-left: auto; }
-  .masthead-tools { position: static; }
+  /* One row on phones: logo on the left, an icon-only Menu button on the right.
+     The help button only lists keyboard shortcuts, so it is hidden on small screens. */
+  .masthead-inner { flex-wrap: wrap; gap: 0 12px; }
+  .logo img { height: 26px; }
+  .brand-tagline { font-size: 0.72rem; }
+  .nav-toggle { display: inline-flex; margin-left: auto; padding: 9px 10px; }
+  .nav-toggle-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .masthead-tools { display: none; }
   .tabs {
     display: none;
     width: 100%;

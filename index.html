@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>CMMC Preflight</title>
   <meta name="description" content="A free first-pass CMMC readiness check for small defense suppliers. Drop in an AWS Terraform plan and get a plain-English report. Your file is read in your browser and is not uploaded.">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/mark-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/mark-180.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,14 +16,11 @@
   <header class="masthead">
     <div class="masthead-inner">
       <a class="brand" href="#overview">
-        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M16 2.5 4.5 7v8.6c0 6.6 4.6 11.6 11.5 13.9 6.9-2.3 11.5-7.3 11.5-13.9V7L16 2.5Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"></path>
-          <path d="m10.5 16.2 4 4 7.2-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-        <span class="brand-text">
-          <strong>CMMC Preflight</strong>
-          <small>CMMC readiness for small defense suppliers</small>
-        </span>
+        <picture class="logo">
+          <source srcset="assets/logo-light-text.png" media="(prefers-color-scheme: dark)">
+          <img src="assets/logo-dark-text.png" alt="CMMC Preflight" width="633" height="88">
+        </picture>
+        <small class="brand-tagline">CMMC readiness for small defense suppliers</small>
       </a>
 
       <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="tabs" aria-label="Menu">
@@ -38,11 +37,6 @@
       </nav>
 
       <div class="masthead-tools">
-        <button type="button" id="theme-toggle" class="icon-button" aria-label="Switch colour theme" title="Theme: follows your system">
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-sun"><circle cx="10" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.7"></circle><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4 4l1.4 1.4M14.6 14.6 16 16M16 4l-1.4 1.4M5.4 14.6 4 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-moon"><path d="M16 11.7A6.5 6.5 0 1 1 8.3 4a5.2 5.2 0 0 0 7.7 7.7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg>
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-auto"><rect x="2.5" y="4" width="15" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"></rect><path d="M7 17h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
-        </button>
         <button type="button" id="help-toggle" class="icon-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.4 7.3a2.7 2.7 0 1 1 3.4 3.1c-.6.2-1 .8-1 1.5v.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="9.8" cy="15.3" r="1" fill="currentColor"></circle></svg>
         </button>
@@ -430,7 +424,7 @@ terraform show -json tfplan &gt; plan.json</code></pre>
         </div>
         <div class="card">
           <h3>Nothing is stored</h3>
-          <p>No cookies, and the only thing kept in browser storage is which colour theme you chose.</p>
+          <p>No cookies, and nothing is kept in browser storage. Light or dark follows your device setting.</p>
         </div>
       </div>
     </section>
@@ -579,7 +573,6 @@ Referrer-Policy: no-referrer</code></pre>
         <dt><kbd>/</kbd></dt><dd>Search the findings</dd>
         <dt><kbd>E</kbd></dt><dd>Expand every finding</dd>
         <dt><kbd>C</kbd></dt><dd>Collapse every finding</dd>
-        <dt><kbd>T</kbd></dt><dd>Change the colour theme</dd>
         <dt><kbd>?</kbd></dt><dd>Open this list</dd>
         <dt><kbd>Esc</kbd></dt><dd>Close this list, or clear the search</dd>
       </dl>

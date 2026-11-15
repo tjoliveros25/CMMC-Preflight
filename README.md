@@ -6,6 +6,8 @@ Rev 2, with a fix for each finding.
 
 **It is not a certification or an assessment.** It covers 10 of 110 requirements, all technical.
 
+**Live site: https://cmmc-preflight.vercel.app**
+
 ## How it works
 
 Everything runs in the browser. The plan file is never uploaded, there is no server, and the
@@ -18,6 +20,7 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 
 | Path | What it holds | Owner |
 | --- | --- | --- |
+| `assets/` | The logo (one per light and dark mode) and the favicon | Report |
 | `index.html` | Five sections: Overview, Run a check, The 10 checks, Security, Limits & FAQ | Report |
 | `src/families.js` | The 14 NIST SP 800-171 families and their counts | Checks |
 | `src/parser.js` | Reads the plan JSON into a flat resource list | Parser |
@@ -51,15 +54,25 @@ disk will show a blank report.
 
 ## What has and has not been verified
 
-Verified: 18 unit tests pass. Both the hand-built samples and two genuine Terraform exports
-(`samples/real-*.json`, from Terraform 1.16.6) produce the expected reports, 0 of 10 and
-10 of 10. The parser handles real plan output, not just the hand-built kind.
+Verified:
+
+- **19 unit tests pass.**
+- **The parser handles real plan output, not just the hand-built kind.** The hand-built samples
+  and three genuine Terraform exports (`samples/real-*.json`, from Terraform 1.16.6) give the
+  expected reports: 0 of 10, 10 of 10, and the partly fixed plan's 5 pass, 4 fail and 1 could
+  not determine.
+- **The fix snippets work in a real plan.** Each snippet in `src/content.js` matches its block
+  in `fixtures/fixed/main.tf`. Terraform planned that file, and the export passes all 10 checks.
+- **The live site works.** On https://cmmc-preflight.vercel.app all four samples give the
+  expected scores, and the Security page's outbound request is blocked by the
+  Content-Security-Policy header that Vercel serves from `vercel.json`.
 
 Not yet verified:
 
-- **The requirement numbers in `src/content.js` are still a proposed mapping.**
-- **The fix snippets have not been applied.**
-- **The Vercel deployment has not been tried.**
+- **The requirement numbers in `src/content.js` are still a proposed mapping.** Confirm each
+  one against the NIST SP 800-171 Rev 2 text.
+- **No fix has been applied to a real AWS account.** The fixtures use placeholder keys and are
+  only ever planned, never applied.
 
 ## A note on what a plan file is
 

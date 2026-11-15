@@ -3,15 +3,15 @@
 ## Open decisions (settle these first)
 
 - [ ] **Who takes which role.** Four roles below, three people. Someone doubles up.
-- [ ] **Cloudflare Pages or Vercel.** `vercel.json` is written; Cloudflare would need its own
-      header file.
+- [x] **Cloudflare Pages or Vercel.** Vercel. Live at https://cmmc-preflight.vercel.app, and
+      the security headers from `vercel.json` are confirmed working there.
 
 ## Links the team needs
 
 | What | Where |
 | --- | --- |
 | GitHub repository | https://github.com/tjoliveros25/CMMC-Preflight |
-| Live site | TBD after first deploy |
+| Live site | https://cmmc-preflight.vercel.app |
 | Submission page | TBD — add the Devpost or event link |
 | Submission deadline | TBD — add date and time |
 
@@ -32,7 +32,7 @@
 | `samples/definitions.js` | The two demo environments, defined once for every sample | Checks engine |
 | `samples/build-sample-files.js` | Regenerates the JSON samples and the example file | Checks engine |
 | `fixtures/` | Terraform source behind the two samples | Checks engine |
-| `tests/cmmc-preflight.test.js` | 16 unit tests | Everyone |
+| `tests/cmmc-preflight.test.js` | 19 unit tests | Everyone |
 | `vercel.json` | Security headers for hosting | Demo |
 | `dev-server.py` | Local preview with those same headers. Not deployed | Demo |
 | `README.md` | Project write-up for GitHub and judges | Submission |
@@ -42,7 +42,7 @@
 ## Running it
 
 ```
-npm test               # 16 tests, all should pass
+npm test               # 19 tests, all should pass
 python dev-server.py   # http://localhost:3000, with the real security headers
 ```
 
@@ -99,8 +99,8 @@ should describe what they did for each one, so say each of these out loud in the
 
 | Criterion | What they ask | What we say |
 | --- | --- | --- |
-| Technology (5) | How technically impressive? Was the problem difficult? | A Terraform plan parser that resolves references across modules, 10 independent checks, three-state logic that reports "could not determine" rather than guessing, 16 unit tests, and a Security page that proves the privacy claim live by attempting an outbound request and showing the browser block it. |
-| Design (5) | Thought into the user experience? How well designed? | Five sections, a live demo that runs the real parser step by step on the home page, filter chips and search over findings, keyboard shortcuts, light and dark themes, a hamburger menu on phones, a print and Markdown export, and every finding written in plain English for a non-engineer. |
+| Technology (5) | How technically impressive? Was the problem difficult? | A Terraform plan parser that resolves references across modules, 10 independent checks, three-state logic that reports "could not determine" rather than guessing, 19 unit tests, and a Security page that proves the privacy claim live by attempting an outbound request and showing the browser block it. |
+| Design (5) | Thought into the user experience? How well designed? | Five sections, a live demo that runs the real parser step by step on the home page, filter chips and search over findings, keyboard shortcuts, light and dark modes that follow the device setting, a hamburger menu on phones, a print and Markdown export, and every finding written in plain English for a non-engineer. |
 | Completion (5) | Does the hack work? Did you achieve what you wanted? | All 10 checks ship and pass tests. Demo it end to end: a plan with problems scores 0 of 10, the fixed plan scores 10 of 10. Scope was set at 10 checks on day one and all 10 are done. |
 | Learning (5) | Did the team stretch themselves? Learn something new? | Each owner names the thing they had not done before: the Terraform JSON format, NIST 800-171 mapping, browser-only file processing, or CSP headers. Prepare one sentence each; this is the criterion teams forget to answer. |
 

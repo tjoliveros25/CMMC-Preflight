@@ -206,3 +206,20 @@ test('real fixed plan from Terraform passes all ten checks', () => {
   const report = buildReport(realPlan('real-fixed-plan.json').resources);
   assert.deepEqual(report.checks.map((c) => [c.id, c.status]), checks.map((c) => [c.id, 'pass']));
 });
+
+test('real partly fixed plan from Terraform: 5 pass, 4 fail, 1 could not determine', () => {
+  const report = buildReport(realPlan('real-partial-plan.json').resources);
+  const expected = {
+    'storage-public': 'fail',
+    'disk-encryption': 'pass',
+    'database-encryption': 'pass',
+    'database-public': 'pass',
+    'admin-ports': 'fail',
+    'wide-open-rules': 'pass',
+    'activity-logging': 'fail',
+    'traffic-logging': 'fail',
+    'admin-permissions': 'unknown',
+    'transit-encryption': 'pass',
+  };
+  assert.deepEqual(report.checks.map((c) => [c.id, c.status]), checks.map((c) => [c.id, expected[c.id]]));
+});

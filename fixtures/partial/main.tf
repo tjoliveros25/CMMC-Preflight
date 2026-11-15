@@ -1,0 +1,169 @@
+# Partly fixed: a shop halfway through cleanup. Expect 5 pass, 4 fail, 1 could not determine.
+# Export only, never apply:
+#   terraform init && terraform plan -out=tfplan && terraform show -json tfplan > partial-plan.json
+
+terraform {
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~> 5.0" }
+  }
+}
+
+provider "aws" {
+  region                      = "us-east-1"
+  access_key                  = "placeholder"
+  secret_key                  = "placeholder"
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  skip_metadata_api_check     = true
+}
+
+# 1. FAIL: the data bucket is blocked, but the logs bucket has no public access block
+resource "aws_s3_bucket" "cui_data" {
+  bucket = "acme-defense-cui"
+}
+
+resource "aws_s3_bucket_public_access_block" "cui_data" {
+  bucket                  = aws_s3_bucket.cui_data.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket" "logs" {
+  bucket = "acme-defense-logs"
+}
+
+# 2. PASS: encrypted disks
+resource "aws_ebs_volume" "app_data" {
+  availability_zone = "us-east-1a"
+  size              = 200
+  encrypted         = true
+}
+
+resource "aws_instance" "app_server" {
+  ami           = "ami-00000000000000000"
+  instance_type = "t3.medium"
+
+  root_block_device {
+    encrypted   = true
+    volume_size = 50
+  }
+}
+
+# 3 and 4. PASS: encrypted database with no public address
+resource "aws_db_instance" "records" {
+  engine              = "postgres"
+  instance_class      = "db.t3.medium"
+  allocated_storage   = 100
+  username            = "records"
+  password            = "change-me-placeholder"
+  storage_encrypted   = true
+  publicly_accessible = false
+  skip_final_snapshot = true
+}
+
+# 8. FAIL: network with no flow log
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+# 5. FAIL: SSH open to the whole internet
+resource "aws_security_group" "admin" {
+  name   = "admin-access"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 6. PASS: only the web port is open to the world
+resource "aws_security_group" "web" {
+  name   = "web"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 7. FAIL: trail covers all regions, but log file validation is off
+resource "aws_cloudtrail" "main" {
+  name                       = "account-activity"
+  s3_bucket_name             = aws_s3_bucket.logs.id
+  is_multi_region_trail      = true
+  enable_log_file_validation = false
+}
+
+# 9. COULD NOT DETERMINE: the policy refers to the bucket's arn, known only after apply
+resource "aws_iam_policy" "ops" {
+  name = "ops-drawings"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:GetObject", "s3:PutObject"]
+      Resource = "${aws_s3_bucket.cui_data.arn}/*"
+    }]
+  })
+}
+
+# 10. PASS: web traffic encrypted; plain HTTP redirects to HTTPS
+resource "aws_subnet" "a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+}
+
+resource "aws_subnet" "b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+}
+
+resource "aws_lb" "web" {
+  name               = "web"
+  load_balancer_type = "application"
+  subnets            = [aws_subnet.a.id, aws_subnet.b.id]
+}
+
+resource "aws_lb_target_group" "web" {
+  name     = "web"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.web.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.web.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = "arn:aws:acm:us-east-1:000000000000:certificate/00000000-0000-0000-0000-000000000000"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web.arn
+  }
+}

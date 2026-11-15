@@ -30,7 +30,8 @@ plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
 | `dev-server.py` | Local preview that applies the real security headers. Not deployed | Demo |
 | `fixtures/` | Terraform source for the insecure and fixed plans | Parser |
 | `tests/` | Unit tests | Everyone |
-| `tools/make-random-plan.js` | Generates random plans for testing the parser | Parser |
+| `tools/make_random_plan.py` | Generates a random plan. Python, so it needs no Node | Parser |
+| `tools/make-random-plan.js` | The same, plus fuzzing the checks over hundreds of plans | Parser |
 | `vercel.json` | Security headers for hosting | Demo |
 
 ## Run it locally
@@ -98,19 +99,25 @@ why this tool reads them in the browser rather than uploading them.
 
 ## Generating test plans
 
-`tools/make-random-plan.js` builds random but structurally valid plan representations, to
-test the parser against shapes nobody wrote by hand.
+Two scripts build random but structurally valid plan representations, to test the parser
+against shapes nobody wrote by hand. They are twins: use whichever language you have.
 
 ```
-node tools/make-random-plan.js --seed 42 --check   # one plan, and what the checks make of it
-node tools/make-random-plan.js --out plan.json     # write one to drop on the page
-npm run fuzz                                       # 300 plans, looking for crashes
+python tools/make_random_plan.py                    # writes plan.json, needs no Node
+python tools/make_random_plan.py --seed 42 --summary
+
+node tools/make-random-plan.js --out plan.json      # the same
+node tools/make-random-plan.js --seed 42 --check    # and what the checks make of it
+npm run fuzz                                        # 300 plans at once, looking for crashes
 ```
 
-Runs are seeded, so `--seed 42` reproduces an exact plan, and a crash during a fuzz run
-writes the offending plan to `failing-plan-N.json`. It covers the fields the checks read,
-not the whole format, so it complements the real exports in `samples/` rather than replacing
-them.
+Runs are seeded, so `--seed 42` reproduces an exact plan. A crash during a fuzz run writes
+the offending plan to `failing-plan-N.json`.
+
+These cover the fields the checks read, not the whole format, and each plan is random, so
+expect a mixed result rather than a clean 0 or 10. **For the demo use the real exports**,
+`samples/real-insecure-plan.json` and `samples/real-fixed-plan.json`, which give 0 of 10 and
+10 of 10.
 
 ## Adding a check
 

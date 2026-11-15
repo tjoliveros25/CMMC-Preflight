@@ -47,6 +47,36 @@ function toast(message) {
   ];
 }
 
+// ---------- Theme ----------
+// Two choices, light and dark. Until the switch is used the page follows the device setting;
+// after that the choice is saved (src/theme-init.js applies it before the page is drawn).
+
+const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const currentTheme = () =>
+  document.documentElement.getAttribute('data-theme') ?? (darkQuery.matches ? 'dark' : 'light');
+
+function labelThemeButton() {
+  const label = currentTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+  $('theme-toggle').setAttribute('aria-label', label);
+  $('theme-toggle').title = label;
+}
+
+function toggleTheme() {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try {
+    localStorage.setItem('theme', next);
+  } catch {
+    /* storage blocked: the choice lasts until the page is closed */
+  }
+  labelThemeButton();
+  toast(next === 'dark' ? 'Dark mode' : 'Light mode');
+}
+
+$('theme-toggle').addEventListener('click', toggleTheme);
+darkQuery.addEventListener('change', labelThemeButton);
+labelThemeButton();
+
 // ---------- Sections ----------
 
 const VIEWS = ['overview', 'check', 'checks', 'security', 'limits'];
@@ -883,6 +913,7 @@ document.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   if (key === 'e') setAllOpen(true);
   else if (key === 'c') setAllOpen(false);
+  else if (key === 't') toggleTheme();
 });
 
 // ---------- Start ----------

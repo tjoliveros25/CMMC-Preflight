@@ -33,7 +33,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper: #0e151b;
     --surface: #162029;
     --sunken: #111a22;
@@ -55,6 +55,29 @@
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -16px rgba(0, 0, 0, 0.8);
     color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --paper: #0e151b;
+  --surface: #162029;
+  --sunken: #111a22;
+  --ink: #e7eef3;
+  --muted: #9cabb7;
+  --line: #2b3944;
+  --line-soft: #223039;
+  --accent: #7cb9e0;
+  --accent-ink: #0b1319;
+  --accent-soft: #1b2b38;
+  --fail: #f28b82;
+  --fail-bg: #3a1c1a;
+  --unknown: #e7b84e;
+  --unknown-bg: #33280f;
+  --pass: #6bd39c;
+  --pass-bg: #14301f;
+  --na: #94a2ad;
+  --na-bg: #212c35;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -16px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -123,6 +146,23 @@ a { color: inherit; }
 .brand { flex-direction: column; align-items: flex-start; gap: 4px; }
 .logo, .logo img { display: block; }
 .logo img { height: 34px; width: auto; }
+/* One logo per mode: dark text on light backgrounds, white text on dark ones. */
+.logo-for-dark { display: none !important; }
+:root[data-theme="dark"] .logo-for-light { display: none !important; }
+:root[data-theme="dark"] .logo-for-dark { display: block !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo-for-light { display: none !important; }
+  :root:not([data-theme="light"]) .logo-for-dark { display: block !important; }
+}
+
+/* The theme switch shows a sun in light mode and a moon in dark mode. */
+.icon-moon { display: none; }
+:root[data-theme="dark"] .icon-sun { display: none; }
+:root[data-theme="dark"] .icon-moon { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-sun { display: none; }
+  :root:not([data-theme="light"]) .icon-moon { display: block; }
+}
 .brand-tagline { color: var(--muted); font-size: 0.78rem; line-height: 1.2; }
 
 .tabs { display: flex; flex-wrap: wrap; gap: 3px; }
@@ -779,6 +819,10 @@ code { font-family: var(--font-data); }
 }
 
 .footer { max-width: 1200px; margin: 0 auto; padding: 24px; color: var(--muted); font-size: 0.82rem; }
+.footer p { margin: 0; }
+.footer p + p { margin-top: 6px; }
+.footer a { color: var(--accent); text-underline-offset: 2px; }
+.footer a:hover { color: var(--ink); }
 
 /* ---------- Drop veil, help sheet, toasts ---------- */
 
@@ -1050,14 +1094,19 @@ li[data-state="done"] .tick::after {
 .proof[data-state="bad"] .proof-result { color: var(--fail); }
 
 @media (max-width: 860px) {
-  /* One row on phones: logo on the left, an icon-only Menu button on the right.
+  /* One row on phones: logo on the left, then the theme switch and an icon-only Menu button.
      The help button only lists keyboard shortcuts, so it is hidden on small screens. */
-  .masthead-inner { flex-wrap: wrap; gap: 0 12px; }
+  .masthead-inner { flex-wrap: wrap; gap: 0 8px; }
+  .brand { order: 1; }
+  .masthead-tools { order: 2; margin-left: auto; }
+  .nav-toggle { order: 3; }
+  .tabs { order: 4; }
+  #help-toggle { display: none; }
   .logo img { height: 26px; }
   .brand-tagline { font-size: 0.72rem; }
-  .nav-toggle { display: inline-flex; margin-left: auto; padding: 9px 10px; }
+  .nav-toggle { display: inline-flex; padding: 9px 10px; }
   .nav-toggle-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .masthead-tools { display: none; }
+  .masthead-tools { position: static; }
   .tabs {
     display: none;
     width: 100%;

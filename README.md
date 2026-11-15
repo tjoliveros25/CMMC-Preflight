@@ -193,7 +193,7 @@ The page uses JavaScript modules, so it must be served. Opening `index.html` str
 
 - **No server.** There is nothing to receive a file even if the page tried to send one.
 - **Enforced, not promised.** `connect-src 'none'` in the Content-Security-Policy blocks fetch, XMLHttpRequest and WebSocket. `form-action 'none'` stops form posts and `frame-ancestors 'none'` stops other sites embedding the page.
-- **Nothing stored.** No cookies and no browser storage. Light or dark follows the device setting.
+- **Almost nothing stored.** No cookies. Light or dark follows the device setting until you use the switch; the only thing kept in browser storage is that choice.
 - **Plans stay out of Git.** Plan files can contain secrets, so `.gitignore` blocks `plan.json` and `tfplan`. The sample plans use placeholder values only.
 - **What this cannot protect against:** a compromised browser or a malicious extension, a tampered copy of the site hosted elsewhere, or the plan file still sitting on your own disk.
 

@@ -1,19 +1,12 @@
 # CMMC Preflight — Team Resource Sheet
 
-## Open decisions (settle these first)
-
-- [ ] **Who takes which role.** Four roles below, three people. Someone doubles up.
-- [x] **Cloudflare Pages or Vercel.** Vercel. Live at https://cmmc-preflight.vercel.app, and
-      the security headers from `vercel.json` are confirmed working there.
-
-## Links the team needs
+## Links
 
 | What | Where |
 | --- | --- |
 | GitHub repository | https://github.com/tjoliveros25/CMMC-Preflight |
 | Live site | https://cmmc-preflight.vercel.app |
 | Submission page | TBD — add the Devpost or event link |
-| Submission deadline | TBD — add date and time |
 
 ## Files in this folder
 
@@ -43,20 +36,17 @@
 
 ```
 npm test               # 19 tests, all should pass
-python dev-server.py   # http://localhost:3000, with the real security headers
+python dev-server.py   # http://localhost:3000
 ```
-
-Node 20 or newer. No dependencies and no build step. The page must be served, not opened from
-disk, because it uses JavaScript modules.
 
 ## Roles
 
 | Role | Owns | Who |
 | --- | --- | --- |
-| Checks engine | `src/parser.js`, `src/checks/`, `samples/`, `fixtures/`, tests | TBD |
-| Design | `index.html`, `styles.css`, `src/content.js`, `src/ui.js`, report readability | TBD |
-| Samples + slides | Sample files, 5 slides | TBD |
-| Demo + video | 2-minute video, leads the 15-minute demo | TBD |
+| Checks engine | `src/parser.js`, `src/checks/`, `samples/`, `fixtures/`, tests | Tristan |
+| Design | `index.html`, `styles.css`, `src/content.js`, `src/ui.js`, report readability | Manuel, Tristan |
+| Samples + slides | Sample files, 5 slides | Manuel, Tristan, Mathew |
+| Demo + video | 2-minute video, leads the 15-minute demo | Manuel |
 
 ## AI tools used
 
@@ -64,8 +54,11 @@ The rules require disclosing this, and judges check. Fill it in as you go.
 
 | Tool | Used for |
 | --- | --- |
-| Claude | Project brief, parser, the 10 checks, report wording, page layout, sample plans, tests |
-| | |
+| Claude | Code: first drafts of the plan parser, the ten checks, the report wording, the page layout and styling, the hand-built sample plans, and the unit tests |
+
+The team directed the work, reviewed and tested what Claude produced, and made the final decisions.
+The real Terraform exports, the corrections to the fix snippets, the interface rename and the README's
+structure were done by team members.
 
 ## Sources for the pitch numbers
 
@@ -104,10 +97,7 @@ should describe what they did for each one, so say each of these out loud in the
 | Completion (5) | Does the hack work? Did you achieve what you wanted? | All 10 checks ship and pass tests. Demo it end to end: a plan with problems scores 0 of 10, the fixed plan scores 10 of 10. Scope was set at 10 checks on day one and all 10 are done. |
 | Learning (5) | Did the team stretch themselves? Learn something new? | Each owner names the thing they had not done before: the Terraform JSON format, NIST 800-171 mapping, browser-only file processing, or CSP headers. Prepare one sentence each; this is the criterion teams forget to answer. |
 
-**Learning is the criterion most often left on the table.** It is 5 of 20 points and it is
-about you, not the product. Write your sentence before Monday.
-
-## Hackathon rules (read before Monday)
+## Hackathon rules
 
 - MLH Hackathon Rules: https://github.com/MLH/mlh-hackathon-rules/blob/master/Rules.md
 - MLH Code of Conduct: https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md
@@ -148,39 +138,4 @@ the git history is public.
 5. Limits, who it's for, next steps — 2 min
 6. Questions — 2 min
 
-**Backup:** record a screen capture of the full run the night before. If the venue wifi fails,
-the site still works offline from `npm start`, but have the recording ready either way.
-
 ## 2-minute video
-
-- 0:00–0:20 The problem and the ~$594K cost
-- 0:20–0:40 "Here's their cloud setup as a Terraform plan"
-- 0:40–1:10 Drop it in, 10 findings turn red with fixes
-- 1:10–1:30 Drop in the fixed file, all green
-- 1:30–2:00 "10 checks, NIST 800-171, runs in your browser, free, readiness check not certification"
-
-## The disclaimer, word for word
-
-Say this in the demo and keep it on the last slide:
-
-> CMMC Preflight reviews 10 technical settings out of the 110 requirements in NIST SP 800-171
-> Revision 2. It is not a CMMC assessment, it does not produce an SPRS score, and a pass does
-> not mean a requirement is met. It checks what a Terraform plan says will be built, not what
-> is running.
-
-## Judge questions to prepare
-
-**"Only 10 of 110 requirements?"** → "We built the part a scanner can automate: technical
-configuration. The rest is policy and people. We scoped to what we could finish and prove."
-
-**"Why not Checkov or Terrascan?"** → "Those exist and have hundreds of rules, but they speak
-to engineers. CMMC Preflight speaks to the person filling in the self-assessment, in plain English,
-mapped to the requirement numbers they have to answer for."
-
-**"Would a supplier upload a file with their network layout in it?"** → "They never upload it.
-Everything runs in the browser, and the site sends a header that forbids the page from making
-outbound connections. Open the network tab during the demo and show it."
-
-**"CMMC is paused. Why does this matter?"** → "Only third-party certification is paused. The
-110 requirements still apply under DFARS 252.204-7012, Phase 1 self-assessments are still
-required, and primes still push it down to subs."

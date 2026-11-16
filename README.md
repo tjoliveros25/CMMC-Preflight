@@ -164,6 +164,7 @@ No install step and no dependencies. You need Node 20 or newer.
 
 ```
 npm test               # run the 19 unit tests
+npm run fuzz           # run 200 random plans through the parser and checks (needs Python)
 python dev-server.py   # view the site at http://localhost:3000
 ```
 
@@ -182,6 +183,7 @@ The page uses JavaScript modules, so it must be served. Opening `index.html` str
 | Real export, partly fixed | ✅ 5 of 10: four to fix, one "could not determine" (`samples/real-partial-plan.json`) |
 | Real export, fully fixed | ✅ 10 of 10 passed (`samples/real-fixed-plan.json`) |
 | Fix snippets applied with real Terraform | ✅ All 10 applied one at a time; 5 did not work as written and were corrected |
+| 200 random plans from `tools/make_random_plan.py` | ✅ No crashes and no malformed reports (`npm run fuzz`) |
 | Resources inside modules | ✅ Read and checked |
 | Wrong files rejected with a clear message | ✅ Not JSON, a state file instead of a plan, and plans with no AWS resources |
 | No data leaves the browser | ✅ Security page counts 0 outside requests; the "Attempt to send data" button is blocked |
@@ -206,6 +208,8 @@ The page uses JavaScript modules, so it must be served. Opening `index.html` str
 | "This file is not JSON" | You dropped the binary `tfplan` | Run `terraform show -json tfplan > plan.json` and drop `plan.json` |
 | "This looks like Terraform state, not a plan" | You dropped `terraform.tfstate` or `terraform show -json` output with no plan | Export a plan with the two commands above |
 | "This plan contains no AWS resources" | The plan is for another cloud | AWS only for now |
+| "This plan is too large to check here" | The plan is over 25 MB, the limit that keeps the page responsive | Export a plan for one environment or module at a time, or follow the pop-up to run the tool locally with a higher limit |
+| "This plan has N resources" | More than 5,000 resources in one plan | Same: split the plan, or raise `MAX_RESOURCES` in `src/ui.js` and run it locally |
 | A check says "could not determine" | The value is only decided at apply time, often because it refers to another resource | Write the value out in full, or accept it as unknown |
 | Blank report when opening `index.html` | Modules cannot load from `file://` | Run `python dev-server.py` |
 | Security page counts 1 request | A browser extension injected a script | Open the site in a private window with extensions off |
@@ -247,15 +251,17 @@ python tools/make_random_plan.py --summary          # list what went into it
 
 Each plan is random, so expect a mixed result rather than a clean 0 or 10. For demos, use the real exports in `samples/`.
 
+`npm run fuzz` uses the generator as a stress test: it runs 200 random plans (or `npm run fuzz -- 1000` for more) through the real parser and all ten checks, and fails if anything crashes, returns an unknown result, or prints a finding with no wording.
+
 ---
 
 ## Team
 
-| Name | What they built |
-|---|---|
-| **Tristan Oliveros** | The plan parser, the ten checks, the report wording and the interface; set up the repository and the branch workflow |
-| **Mathewos Mekuria** | Naming and the interface review that took the project from ReadyCheck to CMMC Preflight |
-| **Manuel Armah** | The three real Terraform exports, the tests that run against them, and a check of every fix by applying it with real Terraform |
+| Name | What they built | What they learned |
+|---|---|---|
+| **Tristan Oliveros** | The plan parser, the ten checks, the report wording and the interface; set up the repository and the branch workflow | The Terraform plan JSON format |
+| **Mathewos Mekuria** | Naming and the interface review that took the project from ReadyCheck to CMMC Preflight | Transforming product branding from scratch |
+| **Manuel Armah** | The three real Terraform exports, the tests that run against them, and a check of every fix by applying it with real Terraform | Testing a fix by applying it: five of the ten suggested fixes did not work as written until they were run through real Terraform |
 
 AI tools used during the hackathon are listed in [RESOURCES.md](RESOURCES.md).
 

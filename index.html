@@ -238,17 +238,23 @@ terraform show -json tfplan &gt; plan.json</code></pre>
           <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
           <strong>Drop plan.json here</strong>
           <span>or choose a file</span>
+          <small class="drop-limit">JSON plan, up to 25 MB</small>
           <input type="file" id="plan-file" accept=".json,application/json">
         </label>
         <p class="privacy-inline">
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 9V6.5a4.5 4.5 0 0 1 9 0V9M4.5 9h11v8h-11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
           Read in your browser. Not uploaded.
         </p>
+        <p class="source-inline">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 6-4 4 4 4M13 6l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <a href="https://github.com/tjoliveros25/cmmc-preflight" rel="noopener" target="_blank">Read the code on GitHub</a>
+        </p>
         <details class="howto">
           <summary>How to export a plan</summary>
           <p>Run these two commands in your Terraform folder, then drop the resulting file above.</p>
           <pre><code>terraform plan -out=tfplan
 terraform show -json tfplan &gt; plan.json</code></pre>
+          <p>Plans up to 25 MB and 5,000 resources can be checked. That covers almost any small business; a larger plan is refused before it is read, so the page never freezes. Export one environment or module at a time instead.</p>
         </details>
         <div class="samples">
           <p>No plan to hand? Load an example.</p>
@@ -483,6 +489,10 @@ Referrer-Policy: no-referrer</code></pre>
 
     <section class="band">
       <blockquote class="statement" id="statement"></blockquote>
+      <p class="source-line">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 6-4 4 4 4M13 6l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span>Open source under the <a href="https://github.com/tjoliveros25/cmmc-preflight/blob/main/LICENSE" rel="license noopener" target="_blank">MIT License</a>. <a href="https://github.com/tjoliveros25/cmmc-preflight" rel="noopener" target="_blank">Read the code on GitHub</a> and check every claim on this page for yourself.</span>
+      </p>
     </section>
 
     <section class="band">
@@ -512,7 +522,16 @@ Referrer-Policy: no-referrer</code></pre>
             <span class="faq-icon" aria-hidden="true"></span>
           </button>
           <div class="faq-panel" id="faq-3-panel" role="region" aria-labelledby="faq-3-button">
-            <div class="faq-inner"><p>You do not upload it. The checks run as JavaScript in your own browser, there is no server component, and the site is served with a Content Security Policy that forbids the page from opening any outbound connection. Open your browser's network tab while you load a plan and you will see no requests. The code is open, so you can confirm it rather than take our word.</p></div>
+            <div class="faq-inner"><p>You do not upload it. The checks run as JavaScript in your own browser, there is no server component, and the site is served with a Content Security Policy that forbids the page from opening any outbound connection. Open your browser's network tab while you load a plan and you will see no requests. The code is open, so you can <a href="https://github.com/tjoliveros25/cmmc-preflight" rel="noopener" target="_blank">confirm it</a> rather than take our word.</p></div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" id="faq-source-button" aria-expanded="false" aria-controls="faq-source-panel">
+            <span class="faq-text">Can I check the code myself?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-panel" id="faq-source-panel" role="region" aria-labelledby="faq-source-button">
+            <div class="faq-inner"><p>Yes. CMMC Preflight is open source under the <a href="https://github.com/tjoliveros25/cmmc-preflight/blob/main/LICENSE" rel="license noopener" target="_blank">MIT License</a>, and every line is <a href="https://github.com/tjoliveros25/cmmc-preflight" rel="noopener" target="_blank">on GitHub</a>. The code that reads your plan is <a href="https://github.com/tjoliveros25/cmmc-preflight/blob/main/src/parser.js" rel="noopener" target="_blank">src/parser.js</a>, and the ten checks are in <a href="https://github.com/tjoliveros25/cmmc-preflight/tree/main/src/checks" rel="noopener" target="_blank">src/checks/</a>, one file each. There is no server code to look for, because there is no server.</p></div>
           </div>
         </div>
         <div class="faq-item">
@@ -569,6 +588,40 @@ Referrer-Policy: no-referrer</code></pre>
 
   <!-- Drag overlay, shortcut help, and toasts -->
   <div class="dropveil" id="dropveil" hidden><div class="dropveil-card">Drop the plan to check it</div></div>
+
+  <div class="sheet" id="limit-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="limit-title" aria-describedby="limit-reason">
+    <div class="sheet-card sheet-card-wide">
+      <div class="sheet-head">
+        <h2 id="limit-title">This plan is too large to check here</h2>
+        <button type="button" class="icon-button" id="limit-close" aria-label="Close">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        </button>
+      </div>
+      <p class="limit-reason" id="limit-reason"></p>
+      <div class="limit-option">
+        <h3>Split the plan</h3>
+        <p>Export a plan for one environment or module at a time, and check each one here. Most small setups fit comfortably.</p>
+      </div>
+      <div class="limit-option">
+        <h3>Run it on your own computer with a higher limit</h3>
+        <p>The project is open source. Clone it, raise <code>MAX_PLAN_BYTES</code> and <code>MAX_RESOURCES</code> in <code>src/ui.js</code>, and start the local preview. It is the same code, still running only in your browser, with nothing uploaded. You need Git and Python 3.</p>
+        <div class="limit-code">
+          <div class="limit-code-head">
+            <span>In a terminal</span>
+            <button type="button" class="button button-small" id="limit-copy">Copy</button>
+          </div>
+          <pre><code id="limit-commands">git clone https://github.com/tjoliveros25/cmmc-preflight.git
+cd cmmc-preflight
+python dev-server.py</code></pre>
+        </div>
+        <p class="limit-note">On a Mac, use <code>python3</code>. Then open http://localhost:3000. Very large plans take longer to display, so expect a pause.</p>
+      </div>
+      <div class="limit-actions">
+        <a class="button" href="https://github.com/tjoliveros25/cmmc-preflight" rel="noopener" target="_blank">Open the repository on GitHub</a>
+        <button type="button" class="button button-primary" id="limit-ok">Got it</button>
+      </div>
+    </div>
+  </div>
 
   <div class="sheet" id="help-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="help-title">
     <div class="sheet-card">

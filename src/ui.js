@@ -397,16 +397,19 @@ const EXAMPLES = [
 ];
 
 async function loadExample(example, button) {
+  if (checking) {
+    toast('Still checking the last plan');
+    return;
+  }
   const previous = button.textContent;
   button.disabled = true;
   button.dataset.busy = 'true';
   try {
-    const plan = await example.load();
-    if (run(() => parsePlan(plan), example.label, true)) {
-      toast(`${example.label}: ${report.passed} of ${report.applicable} passed`);
-    }
-  } catch {
-    showNotice('error', 'That example could not be loaded.', 'Try another, or drop your own plan.json.');
+    const ok = await check(example.label, true, async () => {
+      const plan = await example.load();
+      return () => parsePlan(plan);
+    });
+    if (ok) toast(`${example.label}: ${report.passed} of ${report.applicable} passed`);
   } finally {
     button.disabled = false;
     delete button.dataset.busy;
@@ -459,7 +462,8 @@ let query = '';
 
 // ---------- Summary rail ----------
 
-function renderSummary() {
+function renderSummary(animate = true) {
+  const still = !animate || reduceMotion();
   const bar = h('div', {
     class: 'bar',
     role: 'img',
@@ -490,15 +494,18 @@ function renderSummary() {
     ring.append(c);
   }
   const arc = ring.querySelector('.ring-value');
-  setRing(arc, report.applicable ? report.passed / report.applicable : 0);
+  const fraction = report.applicable ? report.passed / report.applicable : 0;
   arc.dataset.status = report.counts.fail > 0 ? 'fail' : report.counts.unknown > 0 ? 'unknown' : 'pass';
+  // Start empty and sweep to the score, so a new result reads as a new result.
+  setRing(arc, still ? fraction : 0);
+  if (!still) requestAnimationFrame(() => requestAnimationFrame(() => setRing(arc, fraction)));
 
   $('summary').replaceChildren(
     h('h2', { id: 'summary-heading', text: 'Result' }),
     h('div', { class: 'ring-wrap ring-wrap-lg' },
       ring,
       h('div', { class: 'ring-centre' },
-        h('span', { class: 'ring-num', text: String(report.passed) }),
+        h('span', { class: 'ring-num', id: 'ring-num', text: still ? String(report.passed) : '0' }),
         h('span', { class: 'ring-of', text: `of ${report.applicable}` }),
       ),
     ),
@@ -705,7 +712,15 @@ function applyFilter() {
 
 function renderReport() {
   renderSummary();
-  $('findings').replaceChildren(...report.ordered.map(renderCheck));
+  const cards = report.ordered.map(renderCheck);
+  if (!reduceMotion()) {
+    cards.forEach((card, index) => {
+      card.classList.add('is-entering');
+      card.style.setProperty('--i', String(Math.min(index, 10)));
+      card.addEventListener('animationend', () => card.classList.remove('is-entering'), { once: true });
+    });
+  }
+  $('findings').replaceChildren(...cards);
   const problems = report.counts.fail;
   $('results-sub').textContent =
     problems > 0
@@ -716,6 +731,73 @@ function renderReport() {
   $('disclaimer').textContent = DISCLAIMER;
   renderFilters();
   applyFilter();
+}
+
+// The score counts up alongside the ring.
+function countUpScore() {
+  const el = $('ring-num');
+  if (!el || reduceMotion()) return;
+  const target = report.passed;
+  const start = performance.now();
+  const step = (now) => {
+    const t = Math.min(1, (now - start) / 650);
+    el.textContent = String(Math.round(target * (1 - (1 - t) ** 3)));
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// A dashed ring, spinning while a plan is checked and still while waiting for one.
+function dashedRing(extraClass) {
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  ring.setAttribute('viewBox', '0 0 120 120');
+  ring.setAttribute('class', `ring ${extraClass}`);
+  ring.setAttribute('aria-hidden', 'true');
+  const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  for (const [k, v] of Object.entries({ class: 'ring-track', cx: '60', cy: '60', r: '52', fill: 'none', 'stroke-width': '12', 'stroke-dasharray': '6 10', 'stroke-linecap': 'round' })) {
+    track.setAttribute(k, v);
+  }
+  ring.append(track);
+  return ring;
+}
+
+function idleSummary() {
+  $('summary').replaceChildren(
+    h('h2', { id: 'summary-heading', text: 'Result' }),
+    h('div', { class: 'ring-wrap ring-wrap-lg' },
+      dashedRing('ring-empty'),
+      h('div', { class: 'ring-centre' }, h('span', { class: 'ring-dash', text: '\u2013' })),
+    ),
+    h('p', { class: 'rail-idle', text: 'No plan checked yet' }),
+    h('p', { class: 'rail-idle-note', text: 'Your score, the ten findings and the fixes appear here once you load a plan.' }),
+  );
+}
+
+// Shown while a plan is read and checked. Small plans finish almost at once, so it stays up
+// for a moment either way: long enough to see that something happened, short enough not to wait on.
+function showChecking(label) {
+  $('summary').replaceChildren(
+    h('h2', { id: 'summary-heading', text: 'Result' }),
+    h('div', { class: 'ring-wrap ring-wrap-lg' }, dashedRing('ring-empty ring-checking')),
+    h('p', { class: 'rail-idle', text: 'Checking the plan\u2026' }),
+    h('p', { class: 'rail-idle-note', text: `Reading ${label} in your browser. Nothing is uploaded.` }),
+  );
+  $('drop-zone').setAttribute('aria-busy', 'true');
+  $('findings').classList.add('is-checking');
+  $('start').classList.add('is-checking');
+  // Say it where people are looking too: the rail can be below the fold.
+  subtitleBeforeCheck = $('results-sub').textContent;
+  $('results-sub').textContent = `Checking ${label}\u2026`;
+}
+
+let subtitleBeforeCheck = '';
+
+function endChecking() {
+  $('drop-zone').removeAttribute('aria-busy');
+  $('findings').classList.remove('is-checking');
+  $('start').classList.remove('is-checking');
+  // A successful check has already written a new subtitle; a failed one puts the old one back.
+  if ($('results-sub').textContent.startsWith('Checking ')) $('results-sub').textContent = subtitleBeforeCheck;
 }
 
 // Nothing has been checked yet: the page waits rather than running something on its own.
@@ -729,25 +811,7 @@ function showIdle() {
   $('disclaimer').hidden = true;
   $('notice').replaceChildren();
   $('results-sub').textContent = 'Pick an example or drop a plan to begin.';
-  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  ring.setAttribute('viewBox', '0 0 120 120');
-  ring.setAttribute('class', 'ring ring-empty');
-  ring.setAttribute('aria-hidden', 'true');
-  const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  for (const [k, v] of Object.entries({ class: 'ring-track', cx: '60', cy: '60', r: '52', fill: 'none', 'stroke-width': '12', 'stroke-dasharray': '6 10', 'stroke-linecap': 'round' })) {
-    track.setAttribute(k, v);
-  }
-  ring.append(track);
-
-  $('summary').replaceChildren(
-    h('h2', { id: 'summary-heading', text: 'Result' }),
-    h('div', { class: 'ring-wrap ring-wrap-lg' },
-      ring,
-      h('div', { class: 'ring-centre' }, h('span', { class: 'ring-dash', text: '\u2013' })),
-    ),
-    h('p', { class: 'rail-idle', text: 'No plan checked yet' }),
-    h('p', { class: 'rail-idle-note', text: 'Your score, the ten findings and the fixes appear here once you load a plan.' }),
-  );
+  idleSummary();
 }
 
 function showNotice(kind, title, text) {
@@ -769,6 +833,7 @@ function run(parse, label, sample) {
     $('toolbar').hidden = false;
     $('disclaimer').hidden = false;
     renderReport();
+    countUpScore();
     if (sample) showNotice('sample', 'This is a sample plan.', 'Drop your own plan.json on the left to check it.');
     else $('notice').replaceChildren();
     return true;
@@ -776,18 +841,92 @@ function run(parse, label, sample) {
     const message = error instanceof PlanError ? error.message : 'Something went wrong reading this file.';
     showNotice('error', 'We could not read that file.', `${message} The report below is unchanged.`);
     if (!(error instanceof PlanError)) console.error(error);
+    if (error instanceof PlanError && error.code === 'too_many') {
+      openLimitSheet(
+        `${label} has ${error.count.toLocaleString()} resources. This site checks up to ${MAX_RESOURCES.toLocaleString()} at once, and plans up to ${megabytes(MAX_PLAN_BYTES)}, so a very large plan cannot freeze your browser tab. The file was read in your browser only and nothing was uploaded.`,
+      );
+    }
+    // Put back whatever the rail showed before this attempt.
+    if (report) renderSummary(false);
+    else idleSummary();
     return false;
   }
+}
+
+// Limits, so a huge or hostile file cannot freeze the tab. A small supplier's plan is
+// usually well under 1 MB; 25 MB is room for a very large one. The size is checked
+// before the file is read, so an oversized file is never loaded into memory.
+// index.html states both limits (on the drop zone and under "How to export a plan"): change them together.
+const MAX_PLAN_BYTES = 25 * 1024 * 1024;
+const MAX_RESOURCES = 5000;
+const megabytes = (bytes) => `${(bytes / 1024 / 1024).toFixed(bytes < 10 * 1024 * 1024 ? 1 : 0)} MB`;
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+// Let the browser paint the checking state before the work starts.
+const nextPaint = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+
+// One plan at a time: clicks and drops while a plan is being checked are ignored.
+let checking = false;
+
+async function check(label, sample, getPlan) {
+  if (checking) {
+    toast('Still checking the last plan');
+    return false;
+  }
+  checking = true;
+  if (currentView() !== 'check') location.hash = 'check';
+  showChecking(label);
+  try {
+    const [parse] = await Promise.all([getPlan(), pause(reduceMotion() ? 0 : 450), nextPaint()]);
+    await nextPaint();
+    return run(parse, label, sample);
+  } catch (error) {
+    showNotice('error', 'We could not read that file.', `${error.message} The report below is unchanged.`);
+    if (report) renderSummary(false);
+    else idleSummary();
+    return false;
+  } finally {
+    endChecking();
+    checking = false;
+  }
+}
+
+// Wraps the parser so an oversized plan gets a clear message instead of a slow page.
+function parseWithLimits(parse) {
+  const parsed = parse();
+  if (parsed.resources.length > MAX_RESOURCES) {
+    const error = new PlanError(
+      'too_many',
+      `This plan has ${parsed.resources.length.toLocaleString()} resources. CMMC Preflight checks up to ${MAX_RESOURCES.toLocaleString()} at once. Export a plan for one environment or module at a time.`,
+    );
+    error.count = parsed.resources.length;
+    throw error;
+  }
+  return parsed;
 }
 
 // file.text() reads it locally. Nothing is uploaded.
 async function loadFile(file) {
   if (!file) return;
-  const text = await file.text();
-  if (currentView() !== 'check') location.hash = 'check';
-  if (run(() => parsePlanText(text), file.name, false)) {
-    toast(`${file.name}: ${report.passed} of ${report.applicable} passed`);
+  if (file.size === 0) {
+    showNotice('error', 'That file is empty.', 'Export the plan with: terraform show -json tfplan > plan.json');
+    return;
   }
+  if (file.size > MAX_PLAN_BYTES) {
+    showNotice(
+      'error',
+      'That file is too large.',
+      `It is ${megabytes(file.size)}, and CMMC Preflight reads plans up to ${megabytes(MAX_PLAN_BYTES)}. Export a plan for one environment or module at a time. The report below is unchanged.`,
+    );
+    openLimitSheet(
+      `${file.name} is ${megabytes(file.size)}. This site checks plans up to ${megabytes(MAX_PLAN_BYTES)} and ${MAX_RESOURCES.toLocaleString()} resources, so a very large file cannot freeze your browser tab. Your file was not read and nothing was uploaded.`,
+    );
+    return;
+  }
+  const ok = await check(file.name, false, async () => {
+    const text = await file.text();
+    return () => parseWithLimits(() => parsePlanText(text));
+  });
+  if (ok) toast(`${file.name}: ${report.passed} of ${report.applicable} passed`);
 }
 
 const input = $('plan-file');
@@ -818,8 +957,9 @@ window.addEventListener('drop', (event) => {
   event.preventDefault();
   dragDepth = 0;
   veil.hidden = true;
-  const file = event.dataTransfer?.files?.[0];
-  if (file) loadFile(file);
+  const files = event.dataTransfer?.files ?? [];
+  if (files.length > 1) toast(`Checking ${files[0].name} only: one plan at a time`);
+  if (files[0]) loadFile(files[0]);
 });
 
 // ---------- Toolbar ----------
@@ -856,6 +996,38 @@ function setupFaq() {
   if (first) first.click();
 }
 
+// ---------- Too-large dialog ----------
+// Explains the limit and how to run the tool locally with a higher one.
+
+const limitSheet = $('limit-sheet');
+let limitReturnFocus = null;
+
+function openLimitSheet(reason) {
+  $('limit-reason').textContent = reason;
+  limitReturnFocus = document.activeElement;
+  limitSheet.hidden = false;
+  $('limit-ok').focus();
+}
+
+function closeLimitSheet() {
+  limitSheet.hidden = true;
+  if (limitReturnFocus && document.contains(limitReturnFocus)) limitReturnFocus.focus();
+}
+
+$('limit-close').addEventListener('click', closeLimitSheet);
+$('limit-ok').addEventListener('click', closeLimitSheet);
+limitSheet.addEventListener('click', (event) => {
+  if (event.target === limitSheet) closeLimitSheet();
+});
+$('limit-copy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($('limit-commands').textContent);
+    toast('Commands copied');
+  } catch {
+    toast('Your browser blocked the copy');
+  }
+});
+
 // ---------- Shortcut help ----------
 
 const sheet = $('help-sheet');
@@ -880,7 +1052,8 @@ document.addEventListener('keydown', (event) => {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
 
   if (event.key === 'Escape') {
-    if (document.body.classList.contains('nav-open')) closeNav();
+    if (!limitSheet.hidden) closeLimitSheet();
+    else if (document.body.classList.contains('nav-open')) closeNav();
     else if (!sheet.hidden) closeHelp();
     else if (typing && event.target === search) {
       search.value = '';
@@ -891,6 +1064,8 @@ document.addEventListener('keydown', (event) => {
     return;
   }
   if (typing) return;
+  // While the dialog is open, other shortcuts would act on the page behind it.
+  if (!limitSheet.hidden) return;
 
   if (event.key === '/') {
     event.preventDefault();

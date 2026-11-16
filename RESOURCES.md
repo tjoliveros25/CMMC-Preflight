@@ -113,16 +113,6 @@ should describe what they did for each one, so say each of these out loud in the
 - Add a LICENSE file to the repository. MIT is the usual choice.
 - List the AI tools used. See the table above.
 
-### Open question on rule 5
-
-Rule 5 says all work on a project should be done during the hackathon, and rule 10 says
-judges only count what was added during it. Check when the event window officially opened
-against the commit timestamps in the repository. If any of this code predates the start,
-the honest options are to tell the organisers and let them decide what counts, or to treat
-the earlier work as the "existing project" and present only what you build inside the window.
-Ask an organiser rather than guess: rule 13 allows disqualification at their discretion, and
-the git history is public.
-
 ## Plan
 
 **Today:** deploy to Vercel, test both samples on the live link, fill in the TBDs above.

@@ -6,7 +6,7 @@ We built a free website that checks a small defense supplier's AWS setup against
 
 ### 🎬 Video Walkthrough
 
-[Watch the 2-minute demo](PASTE-VIDEO-LINK-HERE)
+[Watch the 2-minute demo](https://www.loom.com/share/46d00b09cbbb4ff8b5823da3a9763bf9)
 
 ---
 

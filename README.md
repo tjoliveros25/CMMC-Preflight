@@ -110,12 +110,8 @@ No plan to hand? Click one of the four examples on the page, or download one of 
 
 ### How it works
 
-Everything runs in the browser. There is no backend.
+<img width="1672" height="941" alt="CMMC Preflight Browser Security Workflow" src="https://github.com/user-attachments/assets/0019e870-804a-426e-ba5a-516e5b654f0d" />
 
-```
-plan.json -> src/parser.js -> src/checks/*.js -> src/report.js -> src/ui.js
-              resource list    findings          report model     the page
-```
 
 1. **Read.** The file is read locally with the browser's File API.
 2. **Parse.** `parser.js` turns Terraform's plan JSON into one flat list of resources, each with its planned values, the values Terraform marks "known after apply", and what it points at in the configuration.
